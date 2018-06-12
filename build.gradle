@@ -1,0 +1,72 @@
+
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+	apply plugin: 'maven-publish'
+	
+	group = "${group}"
+	version = "${version}"
+	
+	repositories {
+
+		maven {url "${nexusPublicUrl}"}
+		maven {url "${nexusSnapshotsUrl}"}
+		mavenLocal()
+		mavenCentral()
+		jcenter()
+	}
+	
+	dependencies {
+		
+	}	
+	
+	tasks.withType(JavaCompile) {  
+		options.encoding = "UTF-8"  
+	} 
+		
+	task sourceJar(type: Jar) {
+		from sourceSets.main.allJava
+	}
+	
+	publishing {
+	    publications {
+	        mavenJava(MavenPublication) {
+	            from components.java
+		    artifact sourceJar {
+			classifier "sources"
+		    }
+	        }
+	    }
+	    repositories {
+	        maven {
+	            url "${nexusReleaseUrl}"
+	            credentials {
+		            username = nexusUsername
+		            password = nexusPassword
+		        }
+	        }
+	    }
+	    
+	}
+	
+}
+
+task cleanGradleLocalCache  { 
+	doLast{ 
+		File file = new File("${getEnv('GRADLE_USER_HOME')}/caches/modules-2/files-2.1/sourcemuch-commons")
+		file.deleteDir()
+	}
+}
+
+
+task showEnv  { 
+
+	doLast{ 
+		println System.getenv()
+	}
+}
+
+def getEnv(name){ 
+	System.getenv()[name]
+}
+

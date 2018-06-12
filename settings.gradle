@@ -1,0 +1,4 @@
+
+rootProject.name = "${group}-socket"
+include ":${group}-socket-core"
+include ":${group}-socket-autoconfig"

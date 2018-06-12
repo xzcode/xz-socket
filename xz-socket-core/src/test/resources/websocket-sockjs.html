@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+   <meta charset="utf-8"></meta>
+   <title>WebSocketTest</title>
+		 <script type="text/javascript" src="./sockjs.min.js"></script>
+      <script type="text/javascript">
+	  var aa;
+	  var ws;
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               
+               
+               // ��һ�� web socket
+               ws = new SockJS("http://localhost:9999/websocket");
+				//ws.binaryType='arrayBuffer';
+
+				ws.onopen = function()
+               {
+                  ws.send("send test data!");
+               };
+				
+               ws.onmessage = function (evt) 
+               { 
+                  var received_msg = evt.data;
+				  aa = received_msg;
+                  console.log("received:" + received_msg);
+               };
+				
+               ws.onclose = function()
+               { 
+                  console.log("closed..."); 
+               };
+            }
+            
+            else
+            {
+               console.log("No support WebSocket!");
+            }
+         }
+      </script>
+		
+   </head>
+   <body>
+   
+      <div id="sse">
+         <a href="javascript:WebSocketTest()">Run Test</a>
+      </div>
+      
+   </body>
+</html>
