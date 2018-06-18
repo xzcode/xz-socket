@@ -1,0 +1,101 @@
+server:
+  port: 9999
+  basepackage: com.xzcode.socket.test.server
+  host: localhost
+  appname: golden-bull-socker-server
+  tmpdir: /app/tmp
+  database:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://${server.host}:3306/golden_bull?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false
+    username: root
+    password: 123456
+
+spring: 
+  application:
+    name: ${server.appname}
+  profiles:
+    active: dev
+  redis:
+    host: common.host
+    prot: 6379
+#    cluster:
+#      nodes: 192.168.211.134:7000,192.168.211.134:7001,192.168.211.134:7002
+#      maxRedirects: 6
+    password:
+    ssl: false
+    timeout: 
+    lettuce:
+      shutdown-timeout: 100ms
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+
+xz:
+  socket: 
+    enabled: true
+    autoRun: false
+    host: 127.0.0.1                       
+    port: ${server.port}                              
+    bossThreadSize: 0                       
+    workThreadSize: 0                       
+    corePoolSize: 10                        
+    maximumPoolSize: 100                    
+    keepAliveTime: 10000                    
+    taskQueueSize: 100                      
+    scanPackage: ${server.basepackage}
+    idleCheckEnabled: true                  
+    readerIdleTime: 5000                    
+    writerIdleTime: 5000                    
+    allIdleTime: 5000                       
+    maxHeartBeatLoseTimes: 3                
+    serverType: websocket
+    useSSL: true
+    serializerType: json
+    websocketPath: /websocket             
+    httpMaxContentLength: 65536  
+  datasource: 
+    druid: 
+      enabled: true
+      driverClassName: ${server.database.driverClassName}
+      url: ${server.database.url}
+      username: ${server.database.username}
+      password: ${server.database.password}
+      initialSize: 1
+      minIdle: 1
+      maxActive: 10
+      maxWait: 10000
+      # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+      timeBetweenEvictionRunsMillis: 60000
+      # 配置一个连接在池中最小生存的时间，单位是毫秒
+      minEvictableIdleTimeMillis: 300000
+      # 空闲时检测
+      testWhileIdle: true
+      # 获取连接验证可用性
+      testOnBorrow: true
+      # 返还连接验证可用性
+      testOnReturn: false
+      # 打开PSCache，并且指定每个连接上PSCache的大小
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      # 验证连接有效与否的SQL，不同的数据配置不同
+      validationQuery: select 1
+
+#mybatis
+mybatis:
+  type-aliases-package: ${server.basepackage}.entity
+  mapper-locations: classpath*:mappers/**/*.xml
+    
+    
+
+logging:
+  file: /app/logs/${server.appname}/${server.appname}.log
+  level: 
+    root: info
+    com: 
+      xzcode: debug
+    io:
+      netty: debug
+    
+ 

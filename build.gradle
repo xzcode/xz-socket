@@ -1,19 +1,12 @@
 
 subprojects {
 	apply plugin: 'java'
-	apply plugin: 'eclipse'
 	apply plugin: 'maven-publish'
 	
-	group = "${group}"
-	version = "${version}"
 	
 	repositories {
 
 		maven {url "${nexusPublicUrl}"}
-		maven {url "${nexusSnapshotsUrl}"}
-		mavenLocal()
-		mavenCentral()
-		jcenter()
 	}
 	
 	dependencies {

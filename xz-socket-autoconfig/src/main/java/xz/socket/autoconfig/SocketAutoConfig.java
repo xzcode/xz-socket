@@ -28,7 +28,7 @@ public class SocketAutoConfig implements ApplicationContextAware {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SocketAutoConfig.class);
 
-    public static final String PROPERTIES_PREFIX = "sourcemuch.commons.socket";
+    public static final String PROPERTIES_PREFIX = "xz.socket";
 
     private ApplicationContext applicationContext;
 

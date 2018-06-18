@@ -44,6 +44,8 @@ public class WebSocketServerStarter implements SocketServerStarter {
 	    	 // Configure SSL.
 		        if (config.isUseSSL()) {
 		            SelfSignedCertificate ssc = new SelfSignedCertificate();
+		            System.out.println("ssc.certificate():\n" + ssc.certificate());
+		            System.out.println("ssc.privateKey():\n" + ssc.privateKey());
 		            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
 		        } else {
 		            sslCtx = null;

@@ -1,4 +1,5 @@
 
-rootProject.name = "${group}-socket"
-include ":${group}-socket-core"
-include ":${group}-socket-autoconfig"
+rootProject.name = "xz-socket"
+include ":${rootProject.name}-core"
+include ":${rootProject.name}-autoconfig"
+include ":${rootProject.name}-test-server"

@@ -1,0 +1,37 @@
+
+
+	buildscript {
+		repositories {
+			maven {url "${nexusPublicUrl}"}
+			mavenLocal()
+		}
+		dependencies {
+			classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		}
+	}
+	
+	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'org.springframework.boot'
+	
+	sourceCompatibility = 1.8
+	
+	
+	version = "${version}"
+		
+
+
+
+	dependencies {
+		
+		compile project(":xz-socket-autoconfig")
+		
+		
+		compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-redis', version: "${springBootVersion}"
+		
+		compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
+		
+		
+	}
+
+
+
