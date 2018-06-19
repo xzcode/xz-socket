@@ -17,7 +17,6 @@ public class OutboundLifeCycleHandler extends ChannelOutboundHandlerAdapter{
 			logger.error("UnsupportedOperationException, channel close ! ", cause);
 			ctx.channel().close();
 		}
-		super.exceptionCaught(ctx, cause);
 	}
 
 	@Override

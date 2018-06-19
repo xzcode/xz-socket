@@ -54,7 +54,6 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		LOGGER.error("Inbound ERROR! ", cause);
-		super.exceptionCaught(ctx, cause);
 	}
 	
 	@Override

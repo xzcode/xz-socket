@@ -1,6 +1,6 @@
 server:
   port: 9090
-  basepackage: com.sourcemuch.commons.socket.hw
+  basepackage: com.xzcode.socket.hw
   host: localhost
   appname: files-service
 

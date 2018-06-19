@@ -1,6 +1,18 @@
 package xz.commons.socket.core.starter.impl;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.KeyStore;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -12,8 +24,6 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import xz.commons.socket.core.config.SocketServerConfig;
 import xz.commons.socket.core.config.scanner.SocketComponentScanner;
 import xz.commons.socket.core.executor.SocketServerTaskExecutor;
@@ -36,6 +46,20 @@ public class WebSocketServerStarter implements SocketServerStarter {
 	
     
     private SslContext sslCtx;
+    public static SSLEngine sslEngine;
+    
+    public SSLContext createSSLContext(String type ,String path ,String password) throws Exception {  
+        KeyStore ks = KeyStore.getInstance(type); /// "JKS"  
+        InputStream ksInputStream = new FileInputStream(path); /// 证书存放地址  
+        ks.load(ksInputStream, password.toCharArray());  
+        //KeyManagerFactory充当基于密钥内容源的密钥管理器的工厂。  
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());//getDefaultAlgorithm:获取默认的 KeyManagerFactory 算法名称。  
+        kmf.init(ks, password.toCharArray());  
+        //SSLContext的实例表示安全套接字协议的实现，它充当用于安全套接字工厂或 SSLEngine 的工厂。  
+        SSLContext sslContext = SSLContext.getInstance("TLS");  
+        sslContext.init(kmf.getKeyManagers(), null, null);  
+        return sslContext;  
+    } 
     
     public WebSocketServerStarter(SocketServerConfig config) {
     	
@@ -43,10 +67,18 @@ public class WebSocketServerStarter implements SocketServerStarter {
 	    	try {
 	    	 // Configure SSL.
 		        if (config.isUseSSL()) {
-		            SelfSignedCertificate ssc = new SelfSignedCertificate();
-		            System.out.println("ssc.certificate():\n" + ssc.certificate());
-		            System.out.println("ssc.privateKey():\n" + ssc.privateKey());
-		            sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+		            //SelfSignedCertificate ssc = new SelfSignedCertificate();
+		        	KeyManagerFactory keyManagerFactory = null;
+		            KeyStore keyStore = KeyStore.getInstance("JKS");
+		            
+		            keyStore.load(new FileInputStream("D:\\tomcat.p12"), "tomcat".toCharArray());
+		            keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+		            keyManagerFactory.init(keyStore,"tomcat".toCharArray());
+		            
+		            sslCtx = SslContextBuilder.forServer(keyManagerFactory).build();
+		            
+		            //sslEngine = createSSLContext("JKS", "d:/tomcat.keystore", "tomcat").createSSLEngine();
+		            //sslEngine.setUseClientMode(false);
 		        } else {
 		            sslCtx = null;
 		        }

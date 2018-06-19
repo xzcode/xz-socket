@@ -33,30 +33,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         
         System.out.println(req.uri().startsWith(websocketPath) +","+ req.uri().equals(websocketPath));
         
-        //req.setUri("/websocket");
-        /*if (!"websocket".equalsIgnoreCase(req.headers().get(HttpHeaderNames.UPGRADE))) {
-        	ctx.close();
-			return;
-		}*/
         ctx.fireChannelRead(req);
-        // Send the index page
-        /*if (!websocketPath.equals(req.uri())) {
-        	//req.headers().add(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
-            String webSocketLocation = getWebSocketLocation(ctx.pipeline(), req, websocketPath);
-            ByteBuf content = Unpooled.copiedBuffer("success", CharsetUtil.UTF_8);
-            FullHttpResponse res = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, content);
-            
-            
-            res.headers().set("Access-Control-Allow-Credentials", "No");
-            res.headers().set("Access-Control-Allow-Origin", "*");
-            res.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/html; charset=UTF-8");
-            HttpUtil.setContentLength(res, content.readableBytes());
-
-            sendHttpResponse(ctx, req, res);
-            //content.release();
-        } else {
-            sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND));
-        }*/
     }
 
     @Override
