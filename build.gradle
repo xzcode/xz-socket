@@ -6,7 +6,7 @@ subprojects {
 	
 	repositories {
 
-		maven {url 'test'.equals(System.getProperty("profile")) ? "${testNexusPublicUrl}" : "${nexusPublicUrl}""}
+		maven {url 'test'.equals(System.getProperty("profile")) ? "${testNexusPublicUrl}" : "${nexusPublicUrl}"}
 	}
 	
 	dependencies {
