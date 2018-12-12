@@ -12,7 +12,7 @@ public class MessageMethodInvoker {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MessageMethodInvoker.class);
 
-	private final Map<Integer, RequestMethodModel> map = new HashMap<>();
+	private final Map<String, RequestMethodModel> map = new HashMap<>();
 
 	private SocketComponentObjectMapper componentObjectMapper;
 
@@ -31,7 +31,7 @@ public class MessageMethodInvoker {
 	 * @author zai
 	 * 2017-07-29
 	 */
-	public Object invoke(Integer requestTag, Object message) throws Exception {
+	public Object invoke(String requestTag, Object message) throws Exception {
 		Method method = map.get(requestTag).getMethod();
 		if (method != null) {
 			//消息体为空
@@ -52,7 +52,7 @@ public class MessageMethodInvoker {
 	 * @author zai
 	 * 2017-07-29
 	 */
-	public void put(Integer requestTag, RequestMethodModel requestMethodModel) {
+	public void put(String requestTag, RequestMethodModel requestMethodModel) {
 		if (map.containsKey(requestTag)) {
 			throw new RuntimeException("requestTag {} is already mapped!");
 		}
@@ -67,7 +67,7 @@ public class MessageMethodInvoker {
 	 * @author zai
 	 * 2017-08-02
 	 */
-	public Integer getSendTag(Integer requestTag){
+	public String getSendTag(String requestTag){
 		return get(requestTag).getSendTag();
 	}
 
@@ -79,7 +79,7 @@ public class MessageMethodInvoker {
 	 * @author zai
 	 * 2017-08-02
 	 */
-	public RequestMethodModel get(Integer requestTag){
+	public RequestMethodModel get(String requestTag){
 		return map.get(requestTag);
 	}
 

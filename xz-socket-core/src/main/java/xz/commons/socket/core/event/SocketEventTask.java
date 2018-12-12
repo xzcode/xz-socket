@@ -23,11 +23,11 @@ private final static Logger LOGGER = LoggerFactory.getLogger(SocketEventTask.cla
 	/**
 	 * event标识
 	 */
-	private int socketEvent;
+	private String socketEvent;
 	
 	
 
-	public SocketEventTask(SocketSession session, int socketEvent, EventMethodInvoker eventMethodInvoker) {
+	public SocketEventTask(SocketSession session, String socketEvent, EventMethodInvoker eventMethodInvoker) {
 		super();
 		this.session = session;
 		this.socketEvent = socketEvent;

@@ -10,12 +10,12 @@ public interface SocketTags {
 		/**
 		 * 心跳 ping
 		 */
-		int PING = 1;
+		String PING = "ping";
 		
 		/**
 		 * 心跳 pong
 		 */
-		int PONG = 2;
+		String PONG = "pong";
 	}
 	
 	/**

@@ -38,7 +38,7 @@ public class SocketRequestTask implements Runnable{
 	/**
 	 * 请求标识
 	 */
-	private int requestTag;
+	private String requestTag;
 	
 	
 	public SocketRequestTask() {
@@ -46,7 +46,7 @@ public class SocketRequestTask implements Runnable{
 	
 	
 
-	public SocketRequestTask(int requestTag, SocketSession session, Object message, MessageMethodInvoker messageMethodInvoker) {
+	public SocketRequestTask(String requestTag, SocketSession session, Object message, MessageMethodInvoker messageMethodInvoker) {
 		super();
 		this.message = message;
 		this.session = session;

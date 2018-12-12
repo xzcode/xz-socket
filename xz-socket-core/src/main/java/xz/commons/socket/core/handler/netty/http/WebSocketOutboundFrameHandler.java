@@ -45,14 +45,15 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 			}
 			
 			SendModel sendModel = (SendModel) msg;
-			int sendTag = sendModel.getSendTag();
+			String sendTag = sendModel.getSendTag();
 			
 			if (sendModel.getMessage() != null) {
 				
 				byte[] bytes = serializer.serialize(sendModel.getMessage());
-				ByteBuf out = ctx.alloc().buffer(4 + bytes.length);
+				ByteBuf out = ctx.alloc().buffer(4 + sendTag.length() + bytes.length);
 				
-				out.writeInt(sendTag);
+				out.writeInt(sendTag.length());
+				out.writeBytes(sendTag.getBytes());
 				out.writeBytes(bytes);
 				
 				super.write(ctx, new BinaryWebSocketFrame(out), promise);
@@ -61,8 +62,9 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 			}
 			
 			
-			ByteBuf out = ctx.alloc().buffer(4);
-			out.writeInt(sendTag);
+			ByteBuf out = ctx.alloc().buffer(4 + sendTag.length());
+			out.writeInt(sendTag.length());
+			out.writeBytes(sendTag.getBytes());
 			super.write(ctx, new BinaryWebSocketFrame(out), promise);
 			
 			

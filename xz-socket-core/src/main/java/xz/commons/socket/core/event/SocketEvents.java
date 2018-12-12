@@ -21,15 +21,15 @@ public interface SocketEvents {
 		/**
 	     * 读空闲
 	     */
-	    int READER_IDLE = 1001;
+		String READER_IDLE = "IdleState.READER_IDLE";
 	    /**
 	     * 写空闲
 	     */
-	    int WRITER_IDLE = 1002;
+		String WRITER_IDLE = "IdleState.READER_IDLE";
 	    /**
 	     * 读与写空闲
 	     */
-	    int ALL_IDLE =1003;
+		String ALL_IDLE = "IdleState.ALL_IDLE";
 
 	}
 	
@@ -46,11 +46,11 @@ public interface SocketEvents {
 		/**
 	     * channel 激活
 	     */
-	    int ACTIVE = 2001;
+		String ACTIVE = "ChannelState.ACTIVE";
 	    /**
 	     * channel 无效化
 	     */
-	    int INACTIVE = 2002;
+		String INACTIVE = "ChannelState.INACTIVE";
 
 	}
 

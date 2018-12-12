@@ -11,7 +11,7 @@ public class EventMethodInvoker {
 	private SocketComponentObjectMapper componentObjectMapper;
 	
 	
-	private final Map<Integer, EventMethodModel> map = new HashMap<>();
+	private final Map<String, EventMethodModel> map = new HashMap<>();
 	
 	
 	
@@ -31,7 +31,7 @@ public class EventMethodInvoker {
 	 * @author zai
 	 * 2017-07-29
 	 */
-	public void invoke(Integer eventTag) throws Exception {
+	public void invoke(String eventTag) throws Exception {
 		EventMethodModel eventMethodModel = map.get(eventTag);
 		if (eventMethodModel != null) {
 			Method method = null;
@@ -67,7 +67,7 @@ public class EventMethodInvoker {
 	 * @author zai
 	 * 2017-08-02
 	 */
-	public EventMethodModel get(Integer eventTag){
+	public EventMethodModel get(String eventTag){
 		return map.get(eventTag);
 	}
 	
@@ -79,7 +79,7 @@ public class EventMethodInvoker {
 	 * @author zai
 	 * 2018-05-29
 	 */
-	public boolean contains(Integer eventTag){
+	public boolean contains(String eventTag){
 		return map.containsKey(eventTag);
 	}
 	

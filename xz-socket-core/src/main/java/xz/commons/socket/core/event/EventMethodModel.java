@@ -6,17 +6,17 @@ import java.util.List;
 
 public class EventMethodModel {
 	
-	private int eventTag;
+	private String eventTag;
 	
 	private List<Method> methods = new ArrayList<>(1);
 	
 	
 
-	public int getEventTag() {
+	public String getEventTag() {
 		return eventTag;
 	}
 
-	public EventMethodModel setEventTag(int eventTag) {
+	public EventMethodModel setEventTag(String eventTag) {
 		this.eventTag = eventTag;
 		return this;
 	}

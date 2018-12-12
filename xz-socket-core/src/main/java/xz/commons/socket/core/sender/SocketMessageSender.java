@@ -15,7 +15,7 @@ public class SocketMessageSender {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(SocketMessageSender.class);
 	
-	public static void send(Channel channel, int sendTag, Object message) {
+	public static void send(Channel channel, String sendTag, Object message) {
 		if (channel != null && channel.isActive()) {
 			channel.writeAndFlush(SendModel.create(sendTag, message));
 		}else {

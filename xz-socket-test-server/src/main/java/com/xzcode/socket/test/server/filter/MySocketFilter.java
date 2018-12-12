@@ -9,7 +9,7 @@ import xz.commons.socket.core.filter.SocketMessageFilter;
 public class MySocketFilter implements SocketMessageFilter {
 
 	@Override
-	public boolean doFilter(int requestTag, Object message) {
+	public boolean doFilter(String requestTag, Object message) {
 		return true;
 	}
 

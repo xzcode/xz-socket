@@ -7,7 +7,7 @@ public class RequestMethodModel {
 	/**
 	 * 请求标识
 	 */
-	private int requestTag;
+	private String requestTag;
 	
 	/**
 	 * 接收消息的class类型
@@ -17,7 +17,7 @@ public class RequestMethodModel {
 	/**
 	 * 发送标识
 	 */
-	private int sendTag;
+	private String sendTag;
 	
 	/**
 	 * 发送消息的class类型
@@ -29,19 +29,19 @@ public class RequestMethodModel {
 	 */
 	private Method method;
 
-	public int getRequestTag() {
+	public String getRequestTag() {
 		return requestTag;
 	}
 
-	public void setRequestTag(int requestTag) {
+	public void setRequestTag(String requestTag) {
 		this.requestTag = requestTag;
 	}
 
-	public int getSendTag() {
+	public String getSendTag() {
 		return sendTag;
 	}
 
-	public void setSendTag(int sendTag) {
+	public void setSendTag(String sendTag) {
 		this.sendTag = sendTag;
 	}
 	

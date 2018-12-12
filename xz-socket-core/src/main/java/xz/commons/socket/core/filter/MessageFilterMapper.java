@@ -43,7 +43,7 @@ public class MessageFilterMapper {
 	 * @author zai
 	 * 2017-09-27
 	 */
-	public static boolean doFilters(int requestTag, Object message) {
+	public static boolean doFilters(String requestTag, Object message) {
 		SocketMessageFilter filter = null;
 		for(int i = 0; i < FILTERS.size(); i ++) {
 			filter = FILTERS.get(i).getFilter();

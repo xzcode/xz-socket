@@ -20,8 +20,8 @@ public class LoginController {
 	
 	
 	
-	@SocketRequest(SocketTags.Login.CHECK_LOGIN_S)
-	@SocketResponse(SocketTags.Login.CHECK_LOGIN_C)
+	@SocketRequest("s.check.login")
+	@SocketResponse("c.check.login")
 	public Map<String, Object> checkLogin(Map<String, Object> req) {
 		
 		String username = (String) req.get("username");

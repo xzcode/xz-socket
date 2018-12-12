@@ -7,6 +7,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface SocketResponse {
 	
-	int value();
+	String value();
 
 }

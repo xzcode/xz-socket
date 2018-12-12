@@ -14,6 +14,16 @@ import xz.commons.socket.core.serializer.ISerializer;
 
 import java.util.List;
 
+/**
+ * TCP自定协议解析
+ * 
+   *     包体总长度   标识长度      标识内容       数据体
+ * +--------+--------+-------+------------+
+ * | 4 byte | 2 byte | tag   |  data body |
+ * +--------+--------+-------+------------+
+ * @author zai
+ *
+ */
 public class DecodeHandler extends ByteToMessageDecoder {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(DecodeHandler.class);
@@ -29,14 +39,14 @@ public class DecodeHandler extends ByteToMessageDecoder {
 	public static final int MAX_PACKAGE_LENGTH = 65536;
 	
 	/**
-	 * 请求标识 字节数
+	 * 请求标识字符串长度单位 字节数
 	 */
-	public static final int REQUEST_TAG_BYTES = 4;
+	public static final int REQUEST_TAG_LENGTH_BYTES = 2;
 	
 	/**
-	 * 请求头 总字节数
+	 * 请求头 长度标识字节数
 	 */
-	public static final int HEADER_BYTES = PACKAGE_LENGTH_BYTES + REQUEST_TAG_BYTES;
+	public static final int HEADER_BYTES = PACKAGE_LENGTH_BYTES + REQUEST_TAG_LENGTH_BYTES;
 	
 	/**
 	 * 序列化工具类
@@ -85,9 +95,14 @@ public class DecodeHandler extends ByteToMessageDecoder {
 			return;
 		}
 		
-		int reqTag = in.readInt();
+		int reqTagSize = in.readInt();
 		
-		byte[] data = new byte[readableBytes - HEADER_BYTES];
+		byte[] dataTag = new byte[reqTagSize];
+		
+		String reqTag = new String(dataTag);
+		
+		//读取数据体 =  总包长 - 标识长度占用字节 - 标识体占用字节数
+		byte[] data = new byte[readableBytes - PACKAGE_LENGTH_BYTES - REQUEST_TAG_LENGTH_BYTES - reqTagSize];
 		
 		//读取数据体部分byte数组
 		in.getBytes(0, data);

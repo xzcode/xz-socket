@@ -50,7 +50,11 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
         if (frame instanceof BinaryWebSocketFrame) {
             // Send the uppercase string back.
             ByteBuf content = ((BinaryWebSocketFrame) frame).content();
-            int tag = content.readInt();
+            int tagLength = content.readInt();
+            byte[] tagBytes = new byte[tagLength];
+            content.readBytes(tagBytes);
+            String tag = new String(tagBytes);
+            
             
             //如果没有数据体
             if (content.readableBytes() == 0) {            	

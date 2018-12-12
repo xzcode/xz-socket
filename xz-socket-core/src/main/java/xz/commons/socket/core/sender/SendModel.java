@@ -2,23 +2,23 @@ package xz.commons.socket.core.sender;
 
 public class SendModel {
 	
-	private int sendTag;
+	private String sendTag;
 	private Object message;
 	
-	public SendModel(int sendTag, Object message) {
+	public SendModel(String sendTag, Object message) {
 		this.sendTag = sendTag;
 		this.message = message;
 	}
 
-	public static SendModel create(int sendTag, Object message) {
+	public static SendModel create(String sendTag, Object message) {
 		return new SendModel(sendTag, message);
 	}
 
-	public int getSendTag() {
+	public String getSendTag() {
 		return sendTag;
 	}
 
-	public void setSendTag(int sendTag) {
+	public void setSendTag(String sendTag) {
 		this.sendTag = sendTag;
 	}
 

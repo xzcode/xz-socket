@@ -24,14 +24,14 @@ public class SocketServerUtil {
 	 * @author zai
 	 * 2017-08-04
 	 */
-	public static void send(Object userId, int sendTag, Object message) {
+	public static void send(Object userId, String sendTag, Object message) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
 		}
 	}
 	
-	public static void send(Object userId, int sendTag) {
+	public static void send(Object userId, String sendTag) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));			
@@ -46,14 +46,14 @@ public class SocketServerUtil {
 	 * @author zai
 	 * 2017-09-18
 	 */
-	public static void send(int sendTag, Object message) {
+	public static void send(String sendTag, Object message) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));			
 		}
 	}
 	
-	public static void send(int sendTag) {
+	public static void send(String sendTag) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));			
@@ -67,7 +67,7 @@ public class SocketServerUtil {
 	 * @author zai
 	 * 2017-09-21
 	 */
-	public static void sendGobal(int sendTag) {
+	public static void sendGobal(String sendTag) {
 		SocketChannelGroups.getGlobalGroup().writeAndFlush(SendModel.create(sendTag, null));
 	}
 	
@@ -80,7 +80,7 @@ public class SocketServerUtil {
 	 * 2017-09-21
 	 */
 	
-	public static void sendGobal(int sendTag, Object message) {
+	public static void sendGobal(String sendTag, Object message) {
 		SocketChannelGroups.getGlobalGroup().writeAndFlush(SendModel.create(sendTag, message));
 	}
 	
@@ -92,7 +92,7 @@ public class SocketServerUtil {
 	 * @author zai
 	 * 2017-09-21
 	 */
-	public static void sendRegistered(int sendTag) {
+	public static void sendRegistered(String sendTag) {
 		SocketChannelGroups.getRegisteredGroup().writeAndFlush(SendModel.create(sendTag, null));
 	}
 	
@@ -105,7 +105,7 @@ public class SocketServerUtil {
 	 * 2017-09-21
 	 */
 	
-	public static void sendRegistered(int sendTag, Object message) {
+	public static void sendRegistered(String sendTag, Object message) {
 		SocketChannelGroups.getRegisteredGroup().writeAndFlush(SendModel.create(sendTag, message));
 	}
 	
