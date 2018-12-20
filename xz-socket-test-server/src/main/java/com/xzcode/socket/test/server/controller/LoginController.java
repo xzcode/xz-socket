@@ -3,11 +3,10 @@ package com.xzcode.socket.test.server.controller;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.xzcode.socket.test.server.tag.SocketTags;
-
-import xz.commons.socket.core.annotation.SocketComponent;
-import xz.commons.socket.core.annotation.SocketRequest;
-import xz.commons.socket.core.annotation.SocketResponse;
+import com.xzcode.socket.core.annotation.SocketComponent;
+import com.xzcode.socket.core.annotation.SocketRequest;
+import com.xzcode.socket.core.annotation.SocketResponse;
+import com.xzcode.socket.core.utils.SocketServerUtil;
 
 /**
  * 登录控制器
@@ -30,6 +29,8 @@ public class LoginController {
 		
 		
 		Map<String, Object> resp = new LinkedHashMap<>();
+		resp.put("username", username);
+		resp.put("password", password);
 		
 		return resp;
 	}

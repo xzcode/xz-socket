@@ -51,8 +51,8 @@ xz:
     allIdleTime: 5000                       
     maxHeartBeatLoseTimes: 3                
     serverType: websocket
-    useSSL: true
-    serializerType: json
+    useSSL: false
+    serializerType: msgpack
     websocketPath: /websocket             
     httpMaxContentLength: 65536  
   datasource: 

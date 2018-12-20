@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import xz.commons.socket.core.starter.SocketServerStarter;
+import com.xzcode.socket.core.starter.SocketServerStarter;
 
 /**
  * 测试服务器启动类

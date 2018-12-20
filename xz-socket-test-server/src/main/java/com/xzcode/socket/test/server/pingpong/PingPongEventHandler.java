@@ -3,14 +3,13 @@ package com.xzcode.socket.test.server.pingpong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xzcode.socket.core.annotation.SocketComponent;
+import com.xzcode.socket.core.annotation.SocketOnEvent;
+import com.xzcode.socket.core.annotation.SocketRequest;
+import com.xzcode.socket.core.event.SocketEvents;
+import com.xzcode.socket.core.utils.SocketServerUtil;
 import com.xzcode.socket.test.server.constant.SocketSessionAttrKeys;
 import com.xzcode.socket.test.server.tag.SocketTags;
-
-import xz.commons.socket.core.annotation.SocketComponent;
-import xz.commons.socket.core.annotation.SocketOnEvent;
-import xz.commons.socket.core.annotation.SocketRequest;
-import xz.commons.socket.core.event.SocketEvents;
-import xz.commons.socket.core.utils.SocketServerUtil;
 
 @SocketComponent
 public class PingPongEventHandler {
