@@ -116,8 +116,9 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
     	if (evt instanceof HandshakeComplete) {
     		//HandshakeComplete handshakeComplete = (HandshakeComplete) evt;
+    		//System.out.println("HandshakeComplete -------------->");
     		
-    		ctx.pipeline().addAfter("WebSocketInboundFrameHandler", "WebSocketOutboundFrameHandler",new WebSocketOutboundFrameHandler(serializer));
+    		//ctx.pipeline().addAfter("WebSocketInboundFrameHandler", "WebSocketOutboundFrameHandler",new WebSocketOutboundFrameHandler(serializer));
 		}
 		super.userEventTriggered(ctx, evt);
 	}
