@@ -1,6 +1,6 @@
 server:
   port: 9999
-  basepackage: com.xzcode.socket.test.server
+  basepackage: com.xzcode.game.server
   host: localhost
   appname: golden-bull-socker-server
   tmpdir: /app/tmp
