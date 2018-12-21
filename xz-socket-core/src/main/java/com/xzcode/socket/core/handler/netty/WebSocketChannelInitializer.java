@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.event.EventMethodInvoker;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
-import com.xzcode.socket.core.handler.netty.http.WebSocketInboundFrameHandler;
-import com.xzcode.socket.core.handler.netty.http.WebSocketOutboundFrameHandler;
 import com.xzcode.socket.core.handler.netty.idle.IdleHandler;
 import com.xzcode.socket.core.handler.netty.life.InboundLifeCycleHandler;
 import com.xzcode.socket.core.handler.netty.life.OutboundLifeCycleHandler;
+import com.xzcode.socket.core.handler.netty.web.WebSocketInboundFrameHandler;
+import com.xzcode.socket.core.handler.netty.web.WebSocketOutboundFrameHandler;
 import com.xzcode.socket.core.message.MessageMethodInvoker;
 import com.xzcode.socket.core.serializer.factory.SerializerFactory;
 

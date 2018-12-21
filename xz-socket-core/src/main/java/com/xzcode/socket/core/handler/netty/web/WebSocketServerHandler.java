@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package com.xzcode.socket.core.handler.netty.http;
+package com.xzcode.socket.core.handler.netty.web;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

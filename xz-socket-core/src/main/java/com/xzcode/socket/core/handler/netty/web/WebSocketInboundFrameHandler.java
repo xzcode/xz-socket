@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.http;
+package com.xzcode.socket.core.handler.netty.web;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,6 +7,8 @@ import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler.HandshakeComplete;
+
+import java.nio.charset.Charset;
 
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessageUnpacker;
@@ -58,11 +60,11 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
             
             //content.readBytes(tagLenBytes);
             Integer readUnsignedShort = content.readUnsignedShort();
-            short tagLength = readUnsignedShort.shortValue();
             
-            byte[] tagBytes = new byte[tagLength + 1];
+            byte[] tagBytes = new byte[readUnsignedShort];
             content.readBytes(tagBytes);
-            String tag = serializer.deserialize(tagBytes, String.class);
+            
+            String tag = new String(tagBytes, Charset.forName("utf-8"));
             
             //如果没有数据体
             if (content.readableBytes() == 0) {            	

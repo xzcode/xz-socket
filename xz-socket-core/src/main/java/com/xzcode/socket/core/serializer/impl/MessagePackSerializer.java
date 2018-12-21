@@ -39,7 +39,9 @@ public class MessagePackSerializer implements ISerializer {
 	@Override
 	public <T> T deserialize(byte[] bytes, Class<T> t) throws Exception {
 			if (t == String.class) {
-				MessageUnpacker unpacker = MessagePack.newDefaultUnpacker(bytes);
+				MessageUnpacker unpacker = new MessagePack.UnpackerConfig()
+			            .withStringDecoderBufferSize(1024) // If your data contains many large strings (the default is 8k)
+			            .newUnpacker(bytes);
 	            String string =  unpacker.unpackString();  
             	unpacker.close();
             	return (T) string;

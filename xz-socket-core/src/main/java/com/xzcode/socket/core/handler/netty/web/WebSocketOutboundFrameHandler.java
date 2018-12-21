@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.http;
+package com.xzcode.socket.core.handler.netty.web;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -50,7 +50,7 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 			
 			SendModel sendModel = (SendModel) msg;
 			
-			byte[] tagBytes = this.serializer.serialize(sendModel.getSendTag());
+			byte[] tagBytes = sendModel.getSendTag().getBytes("utf-8");
 			
 			//如果有消息体
 			if (sendModel.getMessage() != null) {
