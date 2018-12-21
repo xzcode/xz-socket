@@ -2,7 +2,7 @@ server:
   port: 9999
   basepackage: com.xzcode.game.server
   host: localhost
-  appname: golden-bull-socker-server
+  appname: game-server
   tmpdir: /app/tmp
   database:
     driverClassName: com.mysql.jdbc.Driver

@@ -1,5 +1,7 @@
 package com.xzcode.autoconfig;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -19,8 +21,6 @@ import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.starter.SocketServerStarter;
 import com.xzcode.socket.core.starter.impl.DefaultSocketServerStarter;
 import com.xzcode.socket.core.starter.impl.WebSocketServerStarter;
-
-import java.util.Map;
 
 @Configuration
 @ConditionalOnProperty(prefix = SocketAutoConfig.PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
