@@ -1,6 +1,8 @@
 package com.xzcode.socket.core.sender;
 
+import com.google.gson.annotations.Expose;
 import com.xzcode.socket.core.sender.callback.SocketSendMessageCallback;
+import com.xzcode.socket.core.session.imp.SocketSession;
 
 public class SendModel {
 
@@ -9,23 +11,32 @@ public class SendModel {
 
 	/* 消息体 */
 	private Object message;
+	
+	/*sesson*/
+	@Expose
+	private SocketSession session;
 
 	/* io操作完成回调 */
+	@Expose
 	SocketSendMessageCallback successCallback;
-
+	
+	@Expose
 	SocketSendMessageCallback cancelCallback;
-
+	
+	@Expose
 	SocketSendMessageCallback doneCallback;
 
-	public SendModel(String sendTag, Object message) {
+	public SendModel(String sendTag, Object message, SocketSession session) {
 		this.sendTag = sendTag;
 		this.message = message;
+		this.session = session;
 	}
 
-	public SendModel(String sendTag, Object message, SocketSendMessageCallback successCallback) {
+	public SendModel(String sendTag, Object message, SocketSendMessageCallback successCallback, SocketSession session) {
 		super();
 		this.sendTag = sendTag;
 		this.message = message;
+		this.session = session;
 		this.successCallback = successCallback;
 	}
 
@@ -53,12 +64,12 @@ public class SendModel {
 		this.doneCallback = doneCallback;
 	}
 
-	public static SendModel create(String sendTag, Object message, SocketSendMessageCallback successCallback) {
-		return new SendModel(sendTag, message, successCallback);
+	public static SendModel create(String sendTag, Object message, SocketSendMessageCallback successCallback, SocketSession session) {
+		return new SendModel(sendTag, message, successCallback,session);
 	}
 
-	public static SendModel create(String sendTag, Object message) {
-		return new SendModel(sendTag, message);
+	public static SendModel create(String sendTag, Object message, SocketSession session) {
+		return new SendModel(sendTag, message,session);
 	}
 
 	public String getSendTag() {
@@ -83,6 +94,14 @@ public class SendModel {
 
 	public void setCallback(SocketSendMessageCallback callback) {
 		this.successCallback = callback;
+	}
+	
+	public SocketSession getSession() {
+		return session;
+	}
+	
+	public void setSession(SocketSession session) {
+		this.session = session;
 	}
 
 }

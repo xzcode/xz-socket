@@ -27,56 +27,52 @@ public class SocketServerUtil {
 	public static void send(Object userId, String sendTag, Object message) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, session));
 		}
 	}
-	
-	
+
 	/**
 	 * 发送消息
 	 * 
-	 * @param userId 用户id
-	 * @param sendTag 发送消息标识
-	 * @param message 消息体
+	 * @param userId          用户id
+	 * @param sendTag         发送消息标识
+	 * @param message         消息体
 	 * @param successCallback 发送完成回调
-	 * @author zai
-	 * 2018-12-29 14:28:10
+	 * @author zai 2018-12-29 14:28:10
 	 */
 	public static void send(Object userId, String sendTag, Object message, SocketSendMessageCallback successCallback) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, successCallback));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, successCallback, session));
 		}
 	}
 
 	/**
 	 * 根据用户id发送消息（无消息体）
 	 * 
-	 * @param userId 用户id
+	 * @param userId  用户id
 	 * @param sendTag 发送消息标识
-	 * @author zai
-	 * 2018-12-29 14:25:27
+	 * @author zai 2018-12-29 14:25:27
 	 */
 	public static void send(Object userId, String sendTag) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, session));
 		}
 	}
-	
+
 	/**
 	 * 根据用户id发送消息（无消息体）
 	 * 
-	 * @param userId 用户id
-	 * @param sendTag 发送消息标识
+	 * @param userId          用户id
+	 * @param sendTag         发送消息标识
 	 * @param successCallback 发送完成回调
-	 * @author zai
-	 * 2018-12-29 14:26:54
+	 * @author zai 2018-12-29 14:26:54
 	 */
 	public static void send(Object userId, String sendTag, SocketSendMessageCallback successCallback) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, successCallback));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, successCallback, session));
 		}
 	}
 
@@ -91,23 +87,22 @@ public class SocketServerUtil {
 	public static void send(String sendTag, Object message) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, session));
 		}
 	}
-	
+
 	/**
 	 * 发送消息到当前通道
 	 * 
 	 * @param sendTag
 	 * @param message
 	 * @param successCallback 发送完成回调
-	 * @author zai
-	 * 2018-12-29 14:24:27
+	 * @author zai 2018-12-29 14:24:27
 	 */
 	public static void send(String sendTag, Object message, SocketSendMessageCallback successCallback) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, successCallback));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, successCallback, session));
 		}
 	}
 
@@ -116,13 +111,12 @@ public class SocketServerUtil {
 	 * 
 	 * @param sendTag
 	 * @param successCallback 发送完成回调
-	 * @author zai
-	 * 2018-12-29 14:23:18
+	 * @author zai 2018-12-29 14:23:18
 	 */
 	public static void send(String sendTag, SocketSendMessageCallback successCallback) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, successCallback));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, successCallback, session));
 		}
 	}
 
@@ -130,13 +124,12 @@ public class SocketServerUtil {
 	 * 发送消息（无消息体）
 	 * 
 	 * @param sendTag
-	 * @author zai
-	 * 2018-12-29 14:23:54
+	 * @author zai 2018-12-29 14:23:54
 	 */
 	public static void send(String sendTag) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, session));
 		}
 	}
 
@@ -148,7 +141,8 @@ public class SocketServerUtil {
 	 * @author zai 2017-09-21
 	 */
 	public static void sendGobal(String sendTag) {
-		SocketChannelGroups.getGlobalGroup().writeAndFlush(SendModel.create(sendTag, null));
+		SocketChannelGroups.getGlobalGroup()
+				.writeAndFlush(SendModel.create(sendTag, null, SocketSessionUtil.getSession()));
 	}
 
 	/**
@@ -161,7 +155,8 @@ public class SocketServerUtil {
 	 */
 
 	public static void sendGobal(String sendTag, Object message) {
-		SocketChannelGroups.getGlobalGroup().writeAndFlush(SendModel.create(sendTag, message));
+		SocketChannelGroups.getGlobalGroup()
+				.writeAndFlush(SendModel.create(sendTag, message, SocketSessionUtil.getSession()));
 	}
 
 	/**
@@ -172,7 +167,8 @@ public class SocketServerUtil {
 	 * @author zai 2017-09-21
 	 */
 	public static void sendToAllRegistered(String sendTag) {
-		SocketChannelGroups.getRegisteredGroup().writeAndFlush(SendModel.create(sendTag, null));
+		SocketChannelGroups.getRegisteredGroup()
+				.writeAndFlush(SendModel.create(sendTag, null, SocketSessionUtil.getSession()));
 	}
 
 	/**
@@ -185,7 +181,8 @@ public class SocketServerUtil {
 	 */
 
 	public static void sendToAllRegistered(String sendTag, Object message) {
-		SocketChannelGroups.getRegisteredGroup().writeAndFlush(SendModel.create(sendTag, message));
+		SocketChannelGroups.getRegisteredGroup()
+				.writeAndFlush(SendModel.create(sendTag, message, SocketSessionUtil.getSession()));
 	}
 
 	/**
@@ -255,10 +252,9 @@ public class SocketServerUtil {
 	 * @author zai 2017-08-19 01:12:07
 	 */
 	public static void disconnect(Object userId) {
-		getSession().getChannel().close();
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null && session.getChannel() != null) {
-			session.getChannel().disconnect();
+			session.getChannel().close();
 		}
 	}
 

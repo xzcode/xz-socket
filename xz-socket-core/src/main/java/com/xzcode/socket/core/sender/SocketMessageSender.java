@@ -16,16 +16,6 @@ public class SocketMessageSender {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(SocketMessageSender.class);
 	
-	public static void send(Channel channel, String sendTag, Object message) {
-		if (channel != null && channel.isActive()) {
-			channel.writeAndFlush(SendModel.create(sendTag, message));
-		}else {
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Channel is inactived! Message will not be send, sendTag:{}, message:{}", sendTag, SocketJsonUtil.gson().toJson(message));
-			}
-		}
-	}
-	
 	public static void send(Channel channel, SendModel sendModel) {
 		if (channel != null && channel.isActive()) {
 			channel.writeAndFlush(sendModel);			

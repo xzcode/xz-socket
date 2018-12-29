@@ -65,12 +65,13 @@ public class SocketRequestTask implements Runnable{
 			
 			
 			if (!MessageFilterMapper.doFilters(requestTag, message)) {
+				SocketSessionUtil.removeSession();
 				return;
 			}
 			
 			Object returnObj = messageMethodInvoker.invoke(requestTag, this.message);
 			if (returnObj != null) {
-				SocketMessageSender.send(this.session.getChannel(), SendModel.create(messageMethodInvoker.getSendTag(requestTag), returnObj));
+				SocketMessageSender.send(this.session.getChannel(), SendModel.create(messageMethodInvoker.getSendTag(requestTag), returnObj,this.session));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Socket Request Task ERROR!!", e);

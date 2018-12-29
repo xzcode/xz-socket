@@ -2,54 +2,50 @@ package com.xzcode.game.server.model.common;
 
 public class CommonResp {
 	
-	private boolean _success;
+	private boolean success;
 	
-	private int _code;
+	private int code;
 	
-	private String _msg;
+	private String msg;
 	
 	public CommonResp() {
 	}
 	
-	public CommonResp(boolean _success) {
-		this._success = _success;
+	public CommonResp(boolean success) {
+		this.success = success;
 	}
 
-	protected static final CommonResp success() {
+	public static CommonResp success() {
 		return new CommonResp(true);
 	}
 	
-	protected static final CommonResp fail() {
+	public static CommonResp fail() {
 		return new CommonResp(false);
 	}
 	
-	protected final CommonResp code() {
-		this._success = true;
+	public CommonResp setMsg(String msg) {
+		this.msg = msg;
 		return this;
 	}
 
-	public boolean is_success() {
-		return _success;
+	public boolean isSuccess() {
+		return success;
 	}
 
-	public void set_success(boolean _success) {
-		this._success = _success;
+	public void setSuccess(boolean success) {
+		this.success = success;
 	}
 
-	public int get_code() {
-		return _code;
+	public int getCode() {
+		return code;
 	}
 
-	public void set_code(int _code) {
-		this._code = _code;
+	public void setCode(int code) {
+		this.code = code;
 	}
 
-	public String get_msg() {
-		return _msg;
-	}
-
-	public void set_msg(String _msg) {
-		this._msg = _msg;
+	public String getMsg() {
+		return msg;
 	}
 	
 	

@@ -35,24 +35,26 @@ public class SocketAutoConfig implements ApplicationContextAware {
 
     @Bean
     public SocketServerStarter socketServerStarter() {
+    	
+    	SocketServerStarter starter = null;;
 
         SocketServerConfig config = socketServerConfig();
 
         LOGGER.info(config.toString());
 
 
-        beanDefinitionRegistry(config);
-
         if (SocketServerConfig.ServerTypeConstants.SOCKET.equals(config.getServerType())) {
-            return new DefaultSocketServerStarter(config);
+        	starter =  new DefaultSocketServerStarter(config);
 
         } else if (SocketServerConfig.ServerTypeConstants.WEBSOCKET.equals(config.getServerType())) {
-            return new WebSocketServerStarter(config);
+        	starter = new WebSocketServerStarter(config);
         } else {
             Assert.state(true, "Unsupported serverType:" + config.getServerType() + "!");
         }
-
-        return null;
+        
+        beanDefinitionRegistry(config);
+        
+        return starter;
     }
 
     @Bean

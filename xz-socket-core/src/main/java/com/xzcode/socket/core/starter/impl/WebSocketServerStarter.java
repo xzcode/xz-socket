@@ -68,27 +68,7 @@ public class WebSocketServerStarter implements SocketServerStarter {
     public WebSocketServerStarter(SocketServerConfig config) {
     	
     	if (config.isUseSSL()) {
-	    	try {
-	    	 // Configure SSL.
-		        if (config.isUseSSL()) {
-		            //SelfSignedCertificate ssc = new SelfSignedCertificate();
-		        	KeyManagerFactory keyManagerFactory = null;
-		            KeyStore keyStore = KeyStore.getInstance("JKS");
-		            
-		            keyStore.load(new FileInputStream("D:\\tomcat.p12"), "tomcat".toCharArray());
-		            keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-		            keyManagerFactory.init(keyStore,"tomcat".toCharArray());
-		            
-		            sslCtx = SslContextBuilder.forServer(keyManagerFactory).build();
-		            
-		            //sslEngine = createSSLContext("JKS", "d:/tomcat.keystore", "tomcat").createSSLEngine();
-		            //sslEngine.setUseClientMode(false);
-		        } else {
-		            sslCtx = null;
-		        }
-	    	} catch (Exception e) {
-	    		logger.error("SSL error!", e);
-			}
+    		//TODO 完成ssl配置
     	}
     	
     	config.setServerType(SocketServerConfig.ServerTypeConstants.WEBSOCKET);

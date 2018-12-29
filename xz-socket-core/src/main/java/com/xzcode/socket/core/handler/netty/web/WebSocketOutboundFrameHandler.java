@@ -7,6 +7,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xzcode.socket.core.sender.SendModel;
 import com.xzcode.socket.core.serializer.ISerializer;
+import com.xzcode.socket.core.session.SocketSessionUtil;
+import com.xzcode.socket.core.session.imp.SocketSession;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,13 +52,13 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 		if (msg instanceof SendModel) {
 			
+			SendModel sendModel = (SendModel) msg;
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Sending message:{}", GSON.toJson(msg));
+				LOGGER.debug("Sending tag:{} ; message:{}", sendModel.getSendTag(), GSON.toJson(sendModel.getMessage()));
 			}
 			
-			SendModel sendModel = (SendModel) msg;
 			
-			byte[] tagBytes = sendModel.getSendTag().getBytes("utf-8");
+			byte[] tagBytes = sendModel.getSendTag().getBytes();
 			
 			//如果有消息体
 			if (sendModel.getMessage() != null) {
@@ -85,9 +87,11 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 			
 			//添加完成监听
 			promise.addListener((future) -> {
-				if (future.isSuccess() && sendModel.getSuccessCallback() != null) {
+				SocketSessionUtil.setSession(sendModel.getSession());
+				if (future.isDone() && sendModel.getSuccessCallback() != null) {
 					sendModel.getSuccessCallback().call();
 				}
+				SocketSessionUtil.removeSession();
 				
 			});
 			
@@ -96,7 +100,8 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 			super.write(ctx, msg, promise);
 			
 		}else{
-			throw new UnsupportedOperationException("Unsupported outbound data !");
+			ctx.channel().writeAndFlush("Unsupported outbound data !");
+			ctx.channel().close();
 		}
 	}
 
