@@ -82,7 +82,7 @@ public class SocketAutoConfig implements ApplicationContextAware {
             BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(key);
 
             //动态注册bean.
-            defaultListableBeanFactory.registerBeanDefinition(StringUtils.uncapitalize(key.getSimpleName()), beanDefinitionBuilder.getBeanDefinition());
+            defaultListableBeanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
             LOGGER.info("Socket server bean defind:{}", applicationContext.getBean(beanName));
             map.put(key, applicationContext.getBean(beanName));
         }

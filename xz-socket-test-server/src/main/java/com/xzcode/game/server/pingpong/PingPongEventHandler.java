@@ -2,6 +2,7 @@ package com.xzcode.game.server.pingpong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.xzcode.game.server.constant.SocketSessionAttrKeys;
 import com.xzcode.game.server.tag.SocketTags;
@@ -10,7 +11,7 @@ import com.xzcode.socket.core.annotation.SocketOnEvent;
 import com.xzcode.socket.core.annotation.SocketRequest;
 import com.xzcode.socket.core.event.SocketEvents;
 import com.xzcode.socket.core.utils.SocketServerUtil;
-
+@Component
 @SocketComponent
 public class PingPongEventHandler {
 	
@@ -65,7 +66,9 @@ public class PingPongEventHandler {
 			SocketServerUtil.getSession().addAttribute(SocketSessionAttrKeys.HEART_BEAT_MODEL_KEY, pingPongInfo);
 		}
 		
-		SocketServerUtil.send(SocketTags.HeartBeat.PONG);
+		SocketServerUtil.send(SocketTags.HeartBeat.PONG, () -> {
+			System.out.println("mission success");
+		});
 		
 		//重置心跳失败累计次数
 		pingPongInfo.heartBeatLostTimesReset();

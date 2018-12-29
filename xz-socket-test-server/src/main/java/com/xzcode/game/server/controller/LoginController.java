@@ -1,5 +1,7 @@
 package com.xzcode.game.server.controller;
 
+import org.springframework.stereotype.Component;
+
 import com.xzcode.game.server.model.login.LoginReq;
 import com.xzcode.game.server.model.login.LoginResp;
 import com.xzcode.socket.core.annotation.SocketComponent;

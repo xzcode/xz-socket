@@ -1,17 +1,7 @@
 package com.xzcode.socket.core.handler.netty.web;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler.HandshakeComplete;
-
 import java.nio.charset.Charset;
 
-import org.msgpack.core.MessagePack;
-import org.msgpack.core.MessageUnpacker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +12,19 @@ import com.xzcode.socket.core.message.RequestMethodModel;
 import com.xzcode.socket.core.message.SocketRequestTask;
 import com.xzcode.socket.core.serializer.ISerializer;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+
+/**
+ * websocket 消息接收处理器
+ * 
+ * @author zai
+ * 2018-12-29 14:01:13
+ */
 public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketInboundFrameHandler.class);
@@ -51,14 +54,10 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
 
 	@Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
-        // ping and pong frames already handled
     	
         if (frame instanceof BinaryWebSocketFrame) {
-            // Send the uppercase string back.
             ByteBuf content = ((BinaryWebSocketFrame) frame).content();
-            //byte[] tagLenBytes = new byte[2];
             
-            //content.readBytes(tagLenBytes);
             Integer readUnsignedShort = content.readUnsignedShort();
             
             byte[] tagBytes = new byte[readUnsignedShort];
@@ -116,12 +115,14 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
     
     @Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+    	/*
     	if (evt instanceof HandshakeComplete) {
     		//HandshakeComplete handshakeComplete = (HandshakeComplete) evt;
     		//System.out.println("HandshakeComplete -------------->");
     		
     		//ctx.pipeline().addAfter("WebSocketInboundFrameHandler", "WebSocketOutboundFrameHandler",new WebSocketOutboundFrameHandler(serializer));
 		}
+		*/
 		super.userEventTriggered(ctx, evt);
 	}
 

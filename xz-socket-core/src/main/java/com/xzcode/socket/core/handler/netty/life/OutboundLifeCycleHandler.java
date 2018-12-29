@@ -24,6 +24,13 @@ public class OutboundLifeCycleHandler extends ChannelOutboundHandlerAdapter{
 		logger.error(" Outbound disconnect! ");
 		super.disconnect(ctx, promise);
 	}
+
+	@Override
+	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+		super.write(ctx, msg, promise);
+		promise.setSuccess();
+	}
+	
 	
 
 }

@@ -1,5 +1,8 @@
 package com.xzcode.socket.core.handler.netty.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xzcode.socket.core.sender.SendModel;
@@ -11,9 +14,13 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+/**
+ * websocket 消息发送处理器
+ * 
+ * @author zai
+ * 2018-12-29 14:01:59
+ */
 public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketOutboundFrameHandler.class);
@@ -41,7 +48,6 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-		
 		if (msg instanceof SendModel) {
 			
 			if (LOGGER.isDebugEnabled()) {
@@ -74,9 +80,16 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 				out.writeShort(tagBytes.length);
 				out.writeBytes(tagBytes);
 				
-				ctx.write(new BinaryWebSocketFrame(out));
-			
+				ctx.writeAndFlush(new BinaryWebSocketFrame(out));
 			}
+			
+			//添加完成监听
+			promise.addListener((future) -> {
+				if (future.isSuccess() && sendModel.getSuccessCallback() != null) {
+					sendModel.getSuccessCallback().call();
+				}
+				
+			});
 			
 		}else if(msg instanceof DefaultFullHttpResponse){
 			
