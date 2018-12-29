@@ -55,7 +55,7 @@ public class MessageMethodInvoker {
 	 */
 	public void put(String requestTag, RequestMethodModel requestMethodModel) {
 		if (map.containsKey(requestTag)) {
-			throw new RuntimeException("requestTag {} is already mapped!");
+			throw new RuntimeException("requestTag '"+requestTag+"' is already mapped!");
 		}
 		map.put(requestTag, requestMethodModel);
 	}
