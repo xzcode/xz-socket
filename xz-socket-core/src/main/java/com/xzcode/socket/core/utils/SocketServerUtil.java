@@ -1,5 +1,7 @@
 package com.xzcode.socket.core.utils;
 
+import java.util.concurrent.Callable;
+
 import com.xzcode.socket.core.channel.SocketChannelGroups;
 import com.xzcode.socket.core.sender.SendModel;
 import com.xzcode.socket.core.sender.callback.SocketSendMessageCallback;
@@ -27,7 +29,7 @@ public class SocketServerUtil {
 	public static void send(Object userId, String sendTag, Object message) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
 		}
 	}
 
@@ -37,13 +39,13 @@ public class SocketServerUtil {
 	 * @param userId          用户id
 	 * @param sendTag         发送消息标识
 	 * @param message         消息体
-	 * @param successCallback 发送完成回调
+	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:28:10
 	 */
-	public static void send(Object userId, String sendTag, Object message, SocketSendMessageCallback successCallback) {
+	public static void send(Object userId, String sendTag, Object message, Runnable runnable) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, successCallback, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, runnable));
 		}
 	}
 
@@ -57,7 +59,7 @@ public class SocketServerUtil {
 	public static void send(Object userId, String sendTag) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));
 		}
 	}
 
@@ -66,13 +68,13 @@ public class SocketServerUtil {
 	 * 
 	 * @param userId          用户id
 	 * @param sendTag         发送消息标识
-	 * @param successCallback 发送完成回调
+	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:26:54
 	 */
-	public static void send(Object userId, String sendTag, SocketSendMessageCallback successCallback) {
+	public static void send(Object userId, String sendTag, Runnable runnable) {
 		SocketSession session = UserSessonMapper.get(userId);
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, successCallback, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, runnable));
 		}
 	}
 
@@ -87,7 +89,7 @@ public class SocketServerUtil {
 	public static void send(String sendTag, Object message) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
 		}
 	}
 
@@ -96,13 +98,13 @@ public class SocketServerUtil {
 	 * 
 	 * @param sendTag
 	 * @param message
-	 * @param successCallback 发送完成回调
+	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:24:27
 	 */
-	public static void send(String sendTag, Object message, SocketSendMessageCallback successCallback) {
+	public static void send(String sendTag, Object message, Runnable runnable) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, successCallback, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, runnable));
 		}
 	}
 
@@ -110,13 +112,13 @@ public class SocketServerUtil {
 	 * 发送消息（无消息体）
 	 * 
 	 * @param sendTag
-	 * @param successCallback 发送完成回调
+	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:23:18
 	 */
-	public static void send(String sendTag, SocketSendMessageCallback successCallback) {
+	public static void send(String sendTag, Runnable runnable) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, successCallback, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, runnable));
 		}
 	}
 
@@ -129,7 +131,7 @@ public class SocketServerUtil {
 	public static void send(String sendTag) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
-			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, session));
+			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));
 		}
 	}
 
@@ -142,7 +144,7 @@ public class SocketServerUtil {
 	 */
 	public static void sendGobal(String sendTag) {
 		SocketChannelGroups.getGlobalGroup()
-				.writeAndFlush(SendModel.create(sendTag, null, SocketSessionUtil.getSession()));
+				.writeAndFlush(SendModel.create(sendTag, null));
 	}
 
 	/**
@@ -156,7 +158,7 @@ public class SocketServerUtil {
 
 	public static void sendGobal(String sendTag, Object message) {
 		SocketChannelGroups.getGlobalGroup()
-				.writeAndFlush(SendModel.create(sendTag, message, SocketSessionUtil.getSession()));
+				.writeAndFlush(SendModel.create(sendTag, message));
 	}
 
 	/**
@@ -168,7 +170,7 @@ public class SocketServerUtil {
 	 */
 	public static void sendToAllRegistered(String sendTag) {
 		SocketChannelGroups.getRegisteredGroup()
-				.writeAndFlush(SendModel.create(sendTag, null, SocketSessionUtil.getSession()));
+				.writeAndFlush(SendModel.create(sendTag, null));
 	}
 
 	/**
@@ -182,7 +184,7 @@ public class SocketServerUtil {
 
 	public static void sendToAllRegistered(String sendTag, Object message) {
 		SocketChannelGroups.getRegisteredGroup()
-				.writeAndFlush(SendModel.create(sendTag, message, SocketSessionUtil.getSession()));
+				.writeAndFlush(SendModel.create(sendTag, message));
 	}
 
 	/**
@@ -209,7 +211,7 @@ public class SocketServerUtil {
 		session.setRegisteredUserId(userId);
 
 		// 已注册会话绑定
-		UserSessonMapper.put(userId, session);
+		UserSessonMapper.put(userId,session);
 		// 已注册channelgroup绑定
 		SocketChannelGroups.getRegisteredGroup().add(session.getChannel());
 	}

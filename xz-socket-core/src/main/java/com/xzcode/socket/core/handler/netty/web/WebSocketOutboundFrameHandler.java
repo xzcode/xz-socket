@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.xzcode.socket.core.channel.DefaultAttributeKeys;
+import com.xzcode.socket.core.executor.SocketRunnableTask;
+import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.sender.SendModel;
 import com.xzcode.socket.core.serializer.ISerializer;
 import com.xzcode.socket.core.session.SocketSessionUtil;
@@ -28,6 +31,7 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketOutboundFrameHandler.class);
     
     private ISerializer serializer;
+    private SocketServerTaskExecutor taskExecutor;
     
     private static final Gson GSON = new GsonBuilder()
     		.serializeNulls()
@@ -51,8 +55,13 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
 		if (msg instanceof SendModel) {
-			
 			SendModel sendModel = (SendModel) msg;
+			//添加完成监听
+			promise.addListener((future) -> {
+				if (future.isDone() && sendModel.getCallback() != null) {
+					new SocketRunnableTask( sendModel.getCallback(), ctx.channel().attr(DefaultAttributeKeys.SESSION).get());
+				}
+			});
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Sending tag:{} ; message:{}", sendModel.getSendTag(), GSON.toJson(sendModel.getMessage()));
 			}
@@ -85,15 +94,7 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 				ctx.writeAndFlush(new BinaryWebSocketFrame(out));
 			}
 			
-			//添加完成监听
-			promise.addListener((future) -> {
-				SocketSessionUtil.setSession(sendModel.getSession());
-				if (future.isDone() && sendModel.getSuccessCallback() != null) {
-					sendModel.getSuccessCallback().call();
-				}
-				SocketSessionUtil.removeSession();
-				
-			});
+			
 			
 		}else if(msg instanceof DefaultFullHttpResponse){
 			

@@ -54,6 +54,11 @@ public class SocketAutoConfig implements ApplicationContextAware {
         
         beanDefinitionRegistry(config);
         
+        //是否自动运行
+        if (config.isAutoRun()) {
+        	starter.run();
+		}
+        
         return starter;
     }
 

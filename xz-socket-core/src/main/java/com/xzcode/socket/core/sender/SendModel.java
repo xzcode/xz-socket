@@ -1,9 +1,5 @@
 package com.xzcode.socket.core.sender;
 
-import com.google.gson.annotations.Expose;
-import com.xzcode.socket.core.sender.callback.SocketSendMessageCallback;
-import com.xzcode.socket.core.session.imp.SocketSession;
-
 public class SendModel {
 
 	/* 发送消息标识 */
@@ -11,65 +7,28 @@ public class SendModel {
 
 	/* 消息体 */
 	private Object message;
-	
-	/*sesson*/
-	@Expose
-	private SocketSession session;
 
 	/* io操作完成回调 */
-	@Expose
-	SocketSendMessageCallback successCallback;
-	
-	@Expose
-	SocketSendMessageCallback cancelCallback;
-	
-	@Expose
-	SocketSendMessageCallback doneCallback;
+	Runnable callback;
 
-	public SendModel(String sendTag, Object message, SocketSession session) {
+	public SendModel(String sendTag, Object message) {
 		this.sendTag = sendTag;
 		this.message = message;
-		this.session = session;
 	}
 
-	public SendModel(String sendTag, Object message, SocketSendMessageCallback successCallback, SocketSession session) {
+	public SendModel(String sendTag, Object message, Runnable callback) {
 		super();
 		this.sendTag = sendTag;
 		this.message = message;
-		this.session = session;
-		this.successCallback = successCallback;
+		this.callback = callback;
 	}
 
-	public SendModel(String sendTag, Object message, SocketSendMessageCallback successCallback, SocketSendMessageCallback doneCallback) {
-		super();
-		this.sendTag = sendTag;
-		this.message = message;
-		this.successCallback = successCallback;
-		this.doneCallback = doneCallback;
+	public static SendModel create(String sendTag, Object message) {
+		return new SendModel(sendTag, message);
 	}
 
-	public SocketSendMessageCallback getSuccessCallback() {
-		return successCallback;
-	}
-
-	public void setSuccessCallback(SocketSendMessageCallback successCallback) {
-		this.successCallback = successCallback;
-	}
-
-	public SocketSendMessageCallback getDoneCallback() {
-		return doneCallback;
-	}
-
-	public void setDoneCallback(SocketSendMessageCallback doneCallback) {
-		this.doneCallback = doneCallback;
-	}
-
-	public static SendModel create(String sendTag, Object message, SocketSendMessageCallback successCallback, SocketSession session) {
-		return new SendModel(sendTag, message, successCallback,session);
-	}
-
-	public static SendModel create(String sendTag, Object message, SocketSession session) {
-		return new SendModel(sendTag, message,session);
+	public static SendModel create(String sendTag, Object message, Runnable callback) {
+		return new SendModel(sendTag, message, callback);
 	}
 
 	public String getSendTag() {
@@ -87,21 +46,13 @@ public class SendModel {
 	public void setMessage(Object message) {
 		this.message = message;
 	}
-
-	public SocketSendMessageCallback getCallback() {
-		return successCallback;
-	}
-
-	public void setCallback(SocketSendMessageCallback callback) {
-		this.successCallback = callback;
+	
+	public Runnable getCallback() {
+		return callback;
 	}
 	
-	public SocketSession getSession() {
-		return session;
-	}
-	
-	public void setSession(SocketSession session) {
-		this.session = session;
+	public void setCallback(Runnable callback) {
+		this.callback = callback;
 	}
 
 }

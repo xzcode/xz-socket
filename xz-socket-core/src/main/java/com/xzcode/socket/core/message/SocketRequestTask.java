@@ -71,7 +71,7 @@ public class SocketRequestTask implements Runnable{
 			
 			Object returnObj = messageMethodInvoker.invoke(requestTag, this.message);
 			if (returnObj != null) {
-				SocketMessageSender.send(this.session.getChannel(), SendModel.create(messageMethodInvoker.getSendTag(requestTag), returnObj,this.session));
+				SocketMessageSender.send(this.session.getChannel(), SendModel.create(messageMethodInvoker.getSendTag(requestTag), returnObj));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Socket Request Task ERROR!!", e);
