@@ -1,8 +1,19 @@
-package com.xzcode.socket.core.message;
+package com.xzcode.socket.core.message.invoker;
 
 import java.lang.reflect.Method;
 
-public class RequestMethodModel {
+/**
+ * 请求消息调用模型
+ * 
+ * @author zai
+ * 2019-01-01 22:11:15
+ */
+public class MethodInvoker implements IMessageInvoker{
+	
+	/**
+	 * 调用类型
+	 */
+	private int type;
 	
 	/**
 	 * 请求标识
@@ -28,6 +39,30 @@ public class RequestMethodModel {
 	 * 方法对象
 	 */
 	private Method method;
+	
+	/**
+	 * 组件实例对象
+	 */
+	private Object componentObj;
+	
+	/**
+	 * 组件实例对象的class类型
+	 */
+	private Class<?> componentClass;
+	
+	
+
+	@Override
+	public Object invoke(String requestTag, Object message) throws Exception {
+		//如果消息体为空
+		if (message == null) {
+			return method.invoke(componentObj);
+		}
+		//如果消息体不为空
+		return method.invoke(componentObj, message);
+	}
+	
+	
 
 	public String getRequestTag() {
 		return requestTag;
@@ -68,7 +103,26 @@ public class RequestMethodModel {
 	public void setSendMessageClass(Class<?> sendMessageClass) {
 		this.sendMessageClass = sendMessageClass;
 	}
+	public int getType() {
+		return type;
+	}
 	
-	
+	public void setType(int type) {
+		this.type = type;
+	}
 
+	public Object getComponentObj() {
+		return componentObj;
+	}
+	
+	public void setComponentObj(Object componentObj) {
+		this.componentObj = componentObj;
+	}
+	
+	public void setComponentClass(Class<?> componentClass) {
+		this.componentClass = componentClass;
+	}
+	public Class<?> getComponentClass() {
+		return componentClass;
+	}
 }

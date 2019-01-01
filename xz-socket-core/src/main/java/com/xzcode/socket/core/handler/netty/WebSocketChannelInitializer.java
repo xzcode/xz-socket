@@ -13,7 +13,7 @@ import com.xzcode.socket.core.handler.netty.life.InboundLifeCycleHandler;
 import com.xzcode.socket.core.handler.netty.life.OutboundLifeCycleHandler;
 import com.xzcode.socket.core.handler.netty.web.WebSocketInboundFrameHandler;
 import com.xzcode.socket.core.handler.netty.web.WebSocketOutboundFrameHandler;
-import com.xzcode.socket.core.message.MessageMethodInvoker;
+import com.xzcode.socket.core.message.MessageInvokerManager;
 import com.xzcode.socket.core.serializer.factory.SerializerFactory;
 
 import io.netty.channel.ChannelInitializer;
@@ -41,10 +41,6 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 	
 	private SocketServerTaskExecutor taskExecutor;
 	
-	private MessageMethodInvoker messageMethodInvoker;
-	
-	private EventMethodInvoker eventMethodInvoker;
-	
 	private SslContext sslCtx;
 	
 	public WebSocketChannelInitializer() {
@@ -53,15 +49,11 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 	public WebSocketChannelInitializer(
 			SocketServerConfig config,
 			SocketServerTaskExecutor taskExecutor, 
-			MessageMethodInvoker messageMethodInvoker,
-			EventMethodInvoker eventMethodInvoker,
 			SslContext sslCtx
 			) {
 		super();
 		this.config = config;
 		this.taskExecutor = taskExecutor;
-		this.messageMethodInvoker = messageMethodInvoker;
-		this.eventMethodInvoker = eventMethodInvoker;
 		this.sslCtx = sslCtx;
 	}
 
@@ -81,7 +73,7 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 		   	 ch.pipeline().addLast(new IdleStateHandler(config.getReaderIdleTime(), config.getWriterIdleTime(), config.getAllIdleTime(), TimeUnit.MILLISECONDS));
 		   	 
 		   	 //心跳包处理
-		   	 ch.pipeline().addLast(new IdleHandler(this.taskExecutor,this.eventMethodInvoker));
+		   	 ch.pipeline().addLast(new IdleHandler(this.taskExecutor,config.getEventMethodInvoker()));
 		   	 
 	   	}
 	   	
@@ -90,11 +82,11 @@ public class WebSocketChannelInitializer extends ChannelInitializer<SocketChanne
 	   	//ch.pipeline().addLast(new HttpRequestHandler(config.getWebsocketPath()));
 	   	ch.pipeline().addLast(new WebSocketServerCompressionHandler());
 	   	ch.pipeline().addLast(new WebSocketServerProtocolHandler(config.getWebsocketPath(), null, true, config.getHttpMaxContentLength(), false, true));
-	   	ch.pipeline().addLast("WebSocketInboundFrameHandler",new WebSocketInboundFrameHandler(SerializerFactory.geSerializer(config.getSerializerType()),this.taskExecutor, messageMethodInvoker));
+	   	ch.pipeline().addLast("WebSocketInboundFrameHandler",new WebSocketInboundFrameHandler(SerializerFactory.geSerializer(config.getSerializerType()),this.taskExecutor, config.getMessageInvokerManager(), config.getMessageFilterManager()));
 	   	//ch.pipeline().addLast(new WebSocketServerHandler());
 	   	
 	   	//inbound异常处理
-	   	ch.pipeline().addLast(new InboundLifeCycleHandler(this.config, taskExecutor, eventMethodInvoker));
+	   	ch.pipeline().addLast(new InboundLifeCycleHandler(this.config, taskExecutor, config.getEventMethodInvoker()));
 	   	
         
         //Outbound 是反顺序执行

@@ -13,22 +13,23 @@ import java.util.List;
  * @author zai
  * 2018-12-20 10:15:31
  */
-public class MessageFilterMapper {
+public class MessageFilterManager {
 	
-	private static final List<MessageFilterModel> FILTERS = new ArrayList<>(1);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageFilterManager.class);
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessageFilterMapper.class);
+	private final List<MessageFilterModel> filters = new ArrayList<>(1);
 	
 	
-	public static void add(MessageFilterModel filterModel) {
-		FILTERS.add(filterModel);
-		if (FILTERS.size() > 1) {
+	
+	public void add(MessageFilterModel filterModel) {
+		filters.add(filterModel);
+		if (filters.size() > 1) {
 			sort();
 		}
 	}
 	
-	public static void sort() {
-		FILTERS.sort(new Comparator<MessageFilterModel>() {
+	public void sort() {
+		filters.sort(new Comparator<MessageFilterModel>() {
 
 			@Override
 			public int compare(MessageFilterModel o1, MessageFilterModel o2) {
@@ -49,11 +50,11 @@ public class MessageFilterMapper {
 	 * @author zai
 	 * 2017-09-27
 	 */
-	public static boolean doFilters(String requestTag, Object message) {
+	public boolean doFilters(String requestTag, Object message) {
 		SocketMessageFilter filter = null;
-		for(int i = 0; i < FILTERS.size(); i ++) {
-			filter = FILTERS.get(i).getFilter();
-			if (!FILTERS.get(i).getFilter().doFilter(requestTag, message)) {
+		for(int i = 0; i < filters.size(); i ++) {
+			filter = filters.get(i).getFilter();
+			if (!filters.get(i).getFilter().doFilter(requestTag, message)) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Message filtered by {}, requestTag:{} .", filter.getClass().getName(),requestTag);					
 				}

@@ -37,7 +37,8 @@ public class DefaultSocketServerStarter implements SocketServerStarter {
         SocketComponentScanner.scan(
         		config.getComponentObjectMapper(),
         		config.getMessageMethodInvokeMapper(),
-        		config.getEventMethodInvokeMapper(),
+        		config.getEventMethodInvoker(),
+        		config.getMessageFilterManager(),
         		config.getScanPackage()
         		);
         
@@ -61,9 +62,7 @@ public class DefaultSocketServerStarter implements SocketServerStarter {
             //设置消息处理器
             boot.childHandler(new SocketChannelInitializer(
             		config, 
-            		taskExecutor,
-            		config.getMessageMethodInvokeMapper(),
-            		config.getEventMethodInvokeMapper()
+            		taskExecutor
             		));
             
             boot.option(ChannelOption.SO_BACKLOG, 128);         // (5)

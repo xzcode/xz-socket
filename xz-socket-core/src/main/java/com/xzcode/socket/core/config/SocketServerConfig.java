@@ -2,10 +2,12 @@ package com.xzcode.socket.core.config;
 
 import java.util.Arrays;
 
+import com.xzcode.socket.core.component.SocketComponentObjectManager;
 import com.xzcode.socket.core.event.EventMethodInvoker;
-import com.xzcode.socket.core.mapper.SocketComponentObjectMapper;
-import com.xzcode.socket.core.message.MessageMethodInvoker;
+import com.xzcode.socket.core.filter.MessageFilterManager;
+import com.xzcode.socket.core.message.MessageInvokerManager;
 import com.xzcode.socket.core.serializer.factory.SerializerFactory;
+import com.xzcode.socket.core.session.UserSessonManager;
 
 /**
  * socket 服务器配置类
@@ -48,9 +50,11 @@ public class SocketServerConfig {
 	
 	private boolean		useSSL = false;
 	
-	private SocketComponentObjectMapper componentObjectMapper = new SocketComponentObjectMapper();
-	private MessageMethodInvoker messageMethodInvoker = new MessageMethodInvoker(componentObjectMapper);
-	private EventMethodInvoker eventMethodInvoker = new EventMethodInvoker(componentObjectMapper);
+	private SocketComponentObjectManager componentObjectManager = new SocketComponentObjectManager();
+	private MessageInvokerManager messageInvokerManager = new MessageInvokerManager();
+	private MessageFilterManager messageFilterManager = new MessageFilterManager();
+	private EventMethodInvoker eventMethodInvoker = new EventMethodInvoker(componentObjectManager);
+	private UserSessonManager userSessonManager = new UserSessonManager();
 	
 	
 	public static interface ServerTypeConstants{
@@ -201,36 +205,73 @@ public class SocketServerConfig {
 		this.serializerType = serializerType;
 	}
 	
+	
+
 	@Override
 	public String toString() {
-		return "SocketServerConfig [enabled=" + enabled + ", autoRun=" + autoRun + ", host=" + host + ", port=" + port
-				+ ", bossThreadSize=" + bossThreadSize + ", workThreadSize=" + workThreadSize + ", corePoolSize="
-				+ corePoolSize + ", maximumPoolSize=" + maximumPoolSize + ", keepAliveTime=" + keepAliveTime
-				+ ", taskQueueSize=" + taskQueueSize + ", scanPackage=" + Arrays.toString(scanPackage)
-				+ ", idleCheckEnabled=" + idleCheckEnabled + ", readerIdleTime=" + readerIdleTime + ", writerIdleTime="
-				+ writerIdleTime + ", allIdleTime=" + allIdleTime + ", serverType=" + serverType + ", serializerType="
-				+ serializerType + ", websocketPath=" + websocketPath + ", httpMaxContentLength=" + httpMaxContentLength
-				+ ", useSSL=" + useSSL + ", componentObjectMapper=" + componentObjectMapper + ", messageMethodInvoker="
-				+ messageMethodInvoker + ", eventMethodInvoker=" + eventMethodInvoker + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("SocketServerConfig [enabled=");
+		builder.append(enabled);
+		builder.append(", autoRun=");
+		builder.append(autoRun);
+		builder.append(", host=");
+		builder.append(host);
+		builder.append(", port=");
+		builder.append(port);
+		builder.append(", bossThreadSize=");
+		builder.append(bossThreadSize);
+		builder.append(", workThreadSize=");
+		builder.append(workThreadSize);
+		builder.append(", corePoolSize=");
+		builder.append(corePoolSize);
+		builder.append(", maximumPoolSize=");
+		builder.append(maximumPoolSize);
+		builder.append(", keepAliveTime=");
+		builder.append(keepAliveTime);
+		builder.append(", taskQueueSize=");
+		builder.append(taskQueueSize);
+		builder.append(", scanPackage=");
+		builder.append(Arrays.toString(scanPackage));
+		builder.append(", idleCheckEnabled=");
+		builder.append(idleCheckEnabled);
+		builder.append(", readerIdleTime=");
+		builder.append(readerIdleTime);
+		builder.append(", writerIdleTime=");
+		builder.append(writerIdleTime);
+		builder.append(", allIdleTime=");
+		builder.append(allIdleTime);
+		builder.append(", serverType=");
+		builder.append(serverType);
+		builder.append(", serializerType=");
+		builder.append(serializerType);
+		builder.append(", websocketPath=");
+		builder.append(websocketPath);
+		builder.append(", httpMaxContentLength=");
+		builder.append(httpMaxContentLength);
+		builder.append(", useSSL=");
+		builder.append(useSSL);
+		builder.append(", componentObjectMapper=");
+		builder.append(componentObjectManager);
+		builder.append(", messageInvokerManager=");
+		builder.append(messageInvokerManager);
+		builder.append(", eventMethodInvoker=");
+		builder.append(eventMethodInvoker);
+		builder.append(", userSessonManager=");
+		builder.append(userSessonManager);
+		builder.append("]");
+		return builder.toString();
 	}
-
-	public SocketComponentObjectMapper getComponentObjectMapper() {
-		return componentObjectMapper;
+	public SocketComponentObjectManager getComponentObjectMapper() {
+		return componentObjectManager;
 	}
-	public void setComponentObjectMapper(SocketComponentObjectMapper componentObjectMapper) {
-		this.componentObjectMapper = componentObjectMapper;
+	public void setComponentObjectMapper(SocketComponentObjectManager componentObjectMapper) {
+		this.componentObjectManager = componentObjectMapper;
 	}
-	public MessageMethodInvoker getMessageMethodInvokeMapper() {
-		return messageMethodInvoker;
+	public MessageInvokerManager getMessageMethodInvokeMapper() {
+		return messageInvokerManager;
 	}
-	public void setMessageMethodInvokeMapper(MessageMethodInvoker messageMethodInvoker) {
-		this.messageMethodInvoker = messageMethodInvoker;
-	}
-	public EventMethodInvoker getEventMethodInvokeMapper() {
-		return eventMethodInvoker;
-	}
-	public void setEventMethodInvokeMapper(EventMethodInvoker eventMethodInvoker) {
-		this.eventMethodInvoker = eventMethodInvoker;
+	public void setMessageMethodInvokeMapper(MessageInvokerManager messageInvokerManager) {
+		this.messageInvokerManager = messageInvokerManager;
 	}
 	public boolean isUseSSL() {
 		return useSSL;
@@ -238,8 +279,32 @@ public class SocketServerConfig {
 	public void setUseSSL(boolean useSSL) {
 		this.useSSL = useSSL;
 	}
+	public MessageInvokerManager getMessageInvokerManager() {
+		return messageInvokerManager;
+	}
+	public void setMessageInvokerManager(MessageInvokerManager messageInvokerManager) {
+		this.messageInvokerManager = messageInvokerManager;
+	}
+	public EventMethodInvoker getEventMethodInvoker() {
+		return eventMethodInvoker;
+	}
+	public void setEventMethodInvoker(EventMethodInvoker eventMethodInvoker) {
+		this.eventMethodInvoker = eventMethodInvoker;
+	}
+	public UserSessonManager getUserSessonManager() {
+		return userSessonManager;
+	}
+	public void setUserSessonManager(UserSessonManager userSessonManager) {
+		this.userSessonManager = userSessonManager;
+	}
 	
+	public MessageFilterManager getMessageFilterManager() {
+		return messageFilterManager;
+	}
 	
+	public void setMessageFilterManager(MessageFilterManager messageFilterManager) {
+		this.messageFilterManager = messageFilterManager;
+	}
 	
 	
 	

@@ -1,6 +1,6 @@
 package com.xzcode.game.server.controller;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.xzcode.game.server.model.common.CommonResp;
 import com.xzcode.game.server.model.login.LoginReq;
@@ -8,9 +8,7 @@ import com.xzcode.game.server.model.login.LoginResp;
 import com.xzcode.socket.core.annotation.SocketComponent;
 import com.xzcode.socket.core.annotation.SocketRequest;
 import com.xzcode.socket.core.annotation.SocketResponse;
-import com.xzcode.socket.core.session.SocketSessionUtil;
-import com.xzcode.socket.core.session.imp.SocketSession;
-import com.xzcode.socket.core.utils.SocketServerUtil;
+import com.xzcode.socket.core.utils.SocketServerService;
 
 /**
  * 登录控制器
@@ -20,6 +18,9 @@ import com.xzcode.socket.core.utils.SocketServerUtil;
  */
 @SocketComponent
 public class LoginController {
+	
+	@Autowired
+	private SocketServerService sss;
 	
 	
 	/**
@@ -47,13 +48,17 @@ public class LoginController {
 	@SocketRequest("disconnect")
 	public void disconnect() {
 		
-		SocketServerUtil.send("disconnect.call", CommonResp.success().setMsg("关闭连接"), () -> {
+		sss.send("disconnect.call", CommonResp.success().setMsg("关闭连接"), () -> {
 			//SocketServerUtil.disconnect();
 		});
 		int i= 10;
 		while (i-- > 0) {
-			SocketServerUtil.send("disconnect.call", CommonResp.success().setMsg(i+""));
+			sss.send("disconnect.call", CommonResp.success().setMsg(i+""));
 		}
+		
+		sss.on("login.dis.req", (LoginResp o) ->{
+			
+		});
 		
 	}
 	

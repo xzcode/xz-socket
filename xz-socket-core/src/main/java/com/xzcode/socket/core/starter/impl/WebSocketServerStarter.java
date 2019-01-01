@@ -79,7 +79,8 @@ public class WebSocketServerStarter implements SocketServerStarter {
         SocketComponentScanner.scan(
         		config.getComponentObjectMapper(),
         		config.getMessageMethodInvokeMapper(),
-        		config.getEventMethodInvokeMapper(),
+        		config.getEventMethodInvoker(),
+        		config.getMessageFilterManager(),
         		config.getScanPackage()
         		);
     }
@@ -106,8 +107,6 @@ public class WebSocketServerStarter implements SocketServerStarter {
             boot.childHandler(new WebSocketChannelInitializer(
             		config, 
             		taskExecutor,
-            		config.getMessageMethodInvokeMapper(),
-            		config.getEventMethodInvokeMapper(),
             		sslCtx
             		));
             

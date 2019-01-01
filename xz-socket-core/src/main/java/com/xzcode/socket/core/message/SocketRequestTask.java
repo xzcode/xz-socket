@@ -3,7 +3,7 @@ package com.xzcode.socket.core.message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xzcode.socket.core.filter.MessageFilterMapper;
+import com.xzcode.socket.core.filter.MessageFilterManager;
 import com.xzcode.socket.core.sender.SendModel;
 import com.xzcode.socket.core.sender.SocketMessageSender;
 import com.xzcode.socket.core.session.SocketSessionUtil;
@@ -20,10 +20,17 @@ public class SocketRequestTask implements Runnable{
 	private final static Logger LOGGER = LoggerFactory.getLogger(SocketRequestTask.class);
 	
 	
-	private MessageMethodInvoker messageMethodInvoker;
+	private MessageInvokerManager messageInvokerManager;
 	
-	public void setMessageMethodInvokeMapper(MessageMethodInvoker messageMethodInvoker) {
-		this.messageMethodInvoker = messageMethodInvoker;
+	private MessageFilterManager messageFilterManager;
+	
+	
+	public void setMessageMethodInvokeMapper(
+			MessageInvokerManager messageInvokerManager,
+			MessageFilterManager messageFilterManager
+			) {
+		this.messageInvokerManager = messageInvokerManager;
+		this.messageFilterManager = messageFilterManager;
 	}
 	
 	/**
@@ -47,12 +54,13 @@ public class SocketRequestTask implements Runnable{
 	
 	
 
-	public SocketRequestTask(String requestTag, SocketSession session, Object message, MessageMethodInvoker messageMethodInvoker) {
+	public SocketRequestTask(String requestTag, SocketSession session, Object message, MessageInvokerManager messageInvokerManager, MessageFilterManager messageFilterManager) {
 		super();
 		this.message = message;
 		this.session = session;
 		this.requestTag = requestTag;
-		this.messageMethodInvoker = messageMethodInvoker;
+		this.messageInvokerManager = messageInvokerManager;
+		this.messageFilterManager = messageFilterManager;
 	}
 
 
@@ -64,14 +72,14 @@ public class SocketRequestTask implements Runnable{
 		try {
 			
 			
-			if (!MessageFilterMapper.doFilters(requestTag, message)) {
+			if (!this.messageFilterManager.doFilters(requestTag, message)) {
 				SocketSessionUtil.removeSession();
 				return;
 			}
 			
-			Object returnObj = messageMethodInvoker.invoke(requestTag, this.message);
+			Object returnObj = messageInvokerManager.invoke(requestTag, this.message);
 			if (returnObj != null) {
-				SocketMessageSender.send(this.session.getChannel(), SendModel.create(messageMethodInvoker.getSendTag(requestTag), returnObj));
+				SocketMessageSender.send(this.session.getChannel(), SendModel.create(messageInvokerManager.getSendTag(requestTag), returnObj));
 			}
 		} catch (Exception e) {
 			LOGGER.error("Socket Request Task ERROR!!", e);

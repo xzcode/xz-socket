@@ -4,11 +4,11 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.xzcode.socket.core.mapper.SocketComponentObjectMapper;
+import com.xzcode.socket.core.component.SocketComponentObjectManager;
 
 public class EventMethodInvoker {
 	
-	private SocketComponentObjectMapper componentObjectMapper;
+	private SocketComponentObjectManager componentObjectMapper;
 	
 	
 	private final Map<String, EventMethodModel> map = new HashMap<>();
@@ -16,7 +16,7 @@ public class EventMethodInvoker {
 	
 	
 	
-	public EventMethodInvoker(SocketComponentObjectMapper componentObjectMapper) {
+	public EventMethodInvoker(SocketComponentObjectManager componentObjectMapper) {
 		super();
 		this.componentObjectMapper = componentObjectMapper;
 	}

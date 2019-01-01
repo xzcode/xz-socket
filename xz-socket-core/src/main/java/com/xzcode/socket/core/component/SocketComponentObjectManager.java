@@ -1,9 +1,9 @@
-package com.xzcode.socket.core.mapper;
+package com.xzcode.socket.core.component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SocketComponentObjectMapper {
+public class SocketComponentObjectManager {
 	
 	private final Map<Class<?>, Object> map = new HashMap<>();
 	

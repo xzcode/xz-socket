@@ -12,7 +12,7 @@ import com.xzcode.socket.core.event.EventMethodInvoker;
 import com.xzcode.socket.core.event.SocketEventTask;
 import com.xzcode.socket.core.event.SocketEvents;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
-import com.xzcode.socket.core.session.UserSessonMapper;
+import com.xzcode.socket.core.session.UserSessonManager;
 import com.xzcode.socket.core.session.imp.SocketSession;
 
 import java.net.InetSocketAddress;
@@ -96,7 +96,7 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 		//移除全局channelgroup绑定
 		SocketChannelGroups.getGlobalGroup().remove(ctx.channel());
 		
-		UserSessonMapper.remove(session.getRegisteredUserId());
+		config.getUserSessonManager().remove(session.getRegisteredUserId());
 		
 		SocketChannelGroups.getRegisteredGroup().remove(ctx.channel());
 		

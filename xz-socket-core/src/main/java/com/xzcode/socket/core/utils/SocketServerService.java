@@ -1,12 +1,11 @@
 package com.xzcode.socket.core.utils;
 
-import java.util.concurrent.Callable;
-
 import com.xzcode.socket.core.channel.SocketChannelGroups;
+import com.xzcode.socket.core.message.MessageInvokerManager;
+import com.xzcode.socket.core.message.SocketOnMessage;
 import com.xzcode.socket.core.sender.SendModel;
-import com.xzcode.socket.core.sender.callback.SocketSendMessageCallback;
 import com.xzcode.socket.core.session.SocketSessionUtil;
-import com.xzcode.socket.core.session.UserSessonMapper;
+import com.xzcode.socket.core.session.UserSessonManager;
 import com.xzcode.socket.core.session.imp.SocketSession;
 
 /**
@@ -15,7 +14,24 @@ import com.xzcode.socket.core.session.imp.SocketSession;
  * 
  * @author zai 2017-08-04
  */
-public class SocketServerUtil {
+public class SocketServerService {
+	
+	private UserSessonManager userSessonManager;
+	
+	private MessageInvokerManager messageInvokerManager;
+	
+	public void setUserSessonManager(UserSessonManager userSessonManager) {
+		this.userSessonManager = userSessonManager;
+	}
+	
+	
+
+	public SocketServerService(UserSessonManager userSessonManager) {
+		super();
+		this.userSessonManager = userSessonManager;
+	}
+
+
 
 	/**
 	 * 发送消息
@@ -26,8 +42,8 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-08-04
 	 */
-	public static void send(Object userId, String sendTag, Object message) {
-		SocketSession session = UserSessonMapper.get(userId);
+	public void send(Object userId, String sendTag, Object message) {
+		SocketSession session = this.userSessonManager.get(userId);
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
 		}
@@ -42,8 +58,8 @@ public class SocketServerUtil {
 	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:28:10
 	 */
-	public static void send(Object userId, String sendTag, Object message, Runnable runnable) {
-		SocketSession session = UserSessonMapper.get(userId);
+	public void send(Object userId, String sendTag, Object message, Runnable runnable) {
+		SocketSession session = this.userSessonManager.get(userId);
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, runnable));
 		}
@@ -56,8 +72,8 @@ public class SocketServerUtil {
 	 * @param sendTag 发送消息标识
 	 * @author zai 2018-12-29 14:25:27
 	 */
-	public static void send(Object userId, String sendTag) {
-		SocketSession session = UserSessonMapper.get(userId);
+	public void send(Object userId, String sendTag) {
+		SocketSession session = this.userSessonManager.get(userId);
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));
 		}
@@ -71,8 +87,8 @@ public class SocketServerUtil {
 	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:26:54
 	 */
-	public static void send(Object userId, String sendTag, Runnable runnable) {
-		SocketSession session = UserSessonMapper.get(userId);
+	public void send(Object userId, String sendTag, Runnable runnable) {
+		SocketSession session = this.userSessonManager.get(userId);
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, runnable));
 		}
@@ -86,7 +102,7 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-09-18
 	 */
-	public static void send(String sendTag, Object message) {
+	public void send(String sendTag, Object message) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, message));
@@ -101,7 +117,7 @@ public class SocketServerUtil {
 	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:24:27
 	 */
-	public static void send(String sendTag, Object message, Runnable runnable) {
+	public void send(String sendTag, Object message, Runnable runnable) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, message, runnable));
@@ -115,7 +131,7 @@ public class SocketServerUtil {
 	 * @param runnable 发送完成回调
 	 * @author zai 2018-12-29 14:23:18
 	 */
-	public static void send(String sendTag, Runnable runnable) {
+	public void send(String sendTag, Runnable runnable) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, null, runnable));
@@ -128,7 +144,7 @@ public class SocketServerUtil {
 	 * @param sendTag
 	 * @author zai 2018-12-29 14:23:54
 	 */
-	public static void send(String sendTag) {
+	public void send(String sendTag) {
 		SocketSession session = SocketSessionUtil.getSession();
 		if (session != null) {
 			session.getChannel().writeAndFlush(SendModel.create(sendTag, null));
@@ -142,7 +158,7 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-09-21
 	 */
-	public static void sendGobal(String sendTag) {
+	public void sendGobal(String sendTag) {
 		SocketChannelGroups.getGlobalGroup()
 				.writeAndFlush(SendModel.create(sendTag, null));
 	}
@@ -156,7 +172,7 @@ public class SocketServerUtil {
 	 * @author zai 2017-09-21
 	 */
 
-	public static void sendGobal(String sendTag, Object message) {
+	public void sendGobal(String sendTag, Object message) {
 		SocketChannelGroups.getGlobalGroup()
 				.writeAndFlush(SendModel.create(sendTag, message));
 	}
@@ -168,7 +184,7 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-09-21
 	 */
-	public static void sendToAllRegistered(String sendTag) {
+	public void sendToAllRegistered(String sendTag) {
 		SocketChannelGroups.getRegisteredGroup()
 				.writeAndFlush(SendModel.create(sendTag, null));
 	}
@@ -182,7 +198,7 @@ public class SocketServerUtil {
 	 * @author zai 2017-09-21
 	 */
 
-	public static void sendToAllRegistered(String sendTag, Object message) {
+	public void sendToAllRegistered(String sendTag, Object message) {
 		SocketChannelGroups.getRegisteredGroup()
 				.writeAndFlush(SendModel.create(sendTag, message));
 	}
@@ -194,7 +210,7 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-08-04
 	 */
-	public static SocketSession getSession() {
+	public SocketSession getSession() {
 		return SocketSessionUtil.getSession();
 	}
 
@@ -205,13 +221,13 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-08-04
 	 */
-	public static void userRegister(Object userId) {
+	public void userRegister(Object userId) {
 		SocketSession session = SocketSessionUtil.getSession();
 
 		session.setRegisteredUserId(userId);
 
 		// 已注册会话绑定
-		UserSessonMapper.put(userId,session);
+		this.userSessonManager.put(userId,session);
 		// 已注册channelgroup绑定
 		SocketChannelGroups.getRegisteredGroup().add(session.getChannel());
 	}
@@ -222,7 +238,7 @@ public class SocketServerUtil {
 	 * @param userId
 	 * @author zai 2018-12-29 10:22:11
 	 */
-	public static boolean isRegistered() {
+	public boolean isRegistered() {
 		SocketSession session = SocketSessionUtil.getSession();
 		return session.getRegisteredUserId() != null;
 	}
@@ -233,13 +249,13 @@ public class SocketServerUtil {
 	 * @param userId
 	 * @author zai 2017-08-19 01:09:56
 	 */
-	public static SocketSession userUnregister(Object userId) {
+	public SocketSession userUnregister(Object userId) {
 		SocketSession session = SocketSessionUtil.getSession();
 
 		session.unregister();
 
 		// 注销会话绑定
-		UserSessonMapper.remove(userId);
+		this.userSessonManager.remove(userId);
 
 		// 已注册channelgroup绑定
 		SocketChannelGroups.getRegisteredGroup().remove(session.getChannel());
@@ -253,8 +269,8 @@ public class SocketServerUtil {
 	 * @param userId
 	 * @author zai 2017-08-19 01:12:07
 	 */
-	public static void disconnect(Object userId) {
-		SocketSession session = UserSessonMapper.get(userId);
+	public void disconnect(Object userId) {
+		SocketSession session = this.userSessonManager.get(userId);
 		if (session != null && session.getChannel() != null) {
 			session.getChannel().close();
 		}
@@ -265,8 +281,13 @@ public class SocketServerUtil {
 	 * 
 	 * @author zai 2017-09-21
 	 */
-	public static void disconnect() {
+	public void disconnect() {
 		getSession().getChannel().close();
+	}
+
+	public  void on(String string, SocketOnMessage<?> socketOnMessage) {
+		
+		
 	}
 
 }

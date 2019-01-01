@@ -8,9 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.channel.DefaultAttributeKeys;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
-import com.xzcode.socket.core.message.MessageMethodInvoker;
-import com.xzcode.socket.core.message.RequestMethodModel;
+import com.xzcode.socket.core.filter.MessageFilterManager;
+import com.xzcode.socket.core.message.MessageInvokerManager;
 import com.xzcode.socket.core.message.SocketRequestTask;
+import com.xzcode.socket.core.message.invoker.IMessageInvoker;
+import com.xzcode.socket.core.message.invoker.MethodInvoker;
 import com.xzcode.socket.core.serializer.ISerializer;
 
 import java.util.List;
@@ -56,17 +58,22 @@ public class DecodeHandler extends ByteToMessageDecoder {
 	
 	private SocketServerTaskExecutor executor;
 	
-	private MessageMethodInvoker messageMethodInvoker;
+	private MessageInvokerManager messageInvokerManager;
+	
+	private MessageFilterManager messageFilterManager;
+	
+	
 
 	
 	public DecodeHandler() {
 	}
 	
-	public DecodeHandler(ISerializer serializer, SocketServerTaskExecutor executor, MessageMethodInvoker messageMethodInvoker) {
+	public DecodeHandler(ISerializer serializer, SocketServerTaskExecutor executor, MessageInvokerManager messageInvokerManager,MessageFilterManager messageFilterManager) {
 		super();
 		this.serializer = serializer;
 		this.executor = executor;
-		this.messageMethodInvoker = messageMethodInvoker;
+		this.messageInvokerManager = messageInvokerManager;
+		this.messageFilterManager = messageFilterManager;
 	}
 
 
@@ -109,10 +116,10 @@ public class DecodeHandler extends ByteToMessageDecoder {
 		in.getBytes(0, data);
 		
 		//获取与请求标识关联的方法参数对象
-		RequestMethodModel methodModel = messageMethodInvoker.get(reqTag);
+		IMessageInvoker invoker = messageInvokerManager.get(reqTag);
 		
-		if (methodModel != null && methodModel.getRequestMessageClass() != null) {
-			executor.submit(new SocketRequestTask(reqTag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(),serializer.deserialize(data, methodModel.getRequestMessageClass()),this.messageMethodInvoker));
+		if (invoker != null) {
+			executor.submit(new SocketRequestTask(reqTag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(),serializer.deserialize(data, invoker.getRequestMessageClass()),this.messageInvokerManager, this.messageFilterManager));
 		}
 		
 		

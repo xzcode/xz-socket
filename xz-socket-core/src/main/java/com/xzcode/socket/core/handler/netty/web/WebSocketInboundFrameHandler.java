@@ -7,9 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.channel.DefaultAttributeKeys;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
-import com.xzcode.socket.core.message.MessageMethodInvoker;
-import com.xzcode.socket.core.message.RequestMethodModel;
+import com.xzcode.socket.core.filter.MessageFilterManager;
+import com.xzcode.socket.core.message.MessageInvokerManager;
 import com.xzcode.socket.core.message.SocketRequestTask;
+import com.xzcode.socket.core.message.invoker.IMessageInvoker;
+import com.xzcode.socket.core.message.invoker.MethodInvoker;
 import com.xzcode.socket.core.serializer.ISerializer;
 
 import io.netty.buffer.ByteBuf;
@@ -34,20 +36,23 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
     private SocketServerTaskExecutor executor;
     
     
-    private MessageMethodInvoker messageMethodInvoker;
+    private MessageInvokerManager messageInvokerManager;
     
-    public void setMessageMethodInvokeMapper(MessageMethodInvoker messageMethodInvoker) {
-		this.messageMethodInvoker = messageMethodInvoker;
+    private MessageFilterManager messageFilterManager;
+    
+    public void setMessageMethodInvokeMapper(MessageInvokerManager messageInvokerManager) {
+		this.messageInvokerManager = messageInvokerManager;
 	}
     
     public WebSocketInboundFrameHandler() {
 	}
 
-	public WebSocketInboundFrameHandler(ISerializer serializer, SocketServerTaskExecutor executor, MessageMethodInvoker messageMethodInvoker) {
+	public WebSocketInboundFrameHandler(ISerializer serializer, SocketServerTaskExecutor executor, MessageInvokerManager messageInvokerManager, MessageFilterManager messageFilterManager) {
 		super();
 		this.serializer = serializer;
 		this.executor = executor;
-		this.messageMethodInvoker = messageMethodInvoker;
+		this.messageInvokerManager = messageInvokerManager;
+		this.messageFilterManager = messageFilterManager;
 	}
 
 
@@ -68,7 +73,7 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
             //如果没有数据体
             if (content.readableBytes() == 0) {            	
             	
-            	executor.submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), null ,this.messageMethodInvoker));
+            	executor.submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), null ,this.messageInvokerManager,this.messageFilterManager));
             	if(LOGGER.isDebugEnabled()){
                 	LOGGER.debug("{} received binary message, tag:{} ; bytes-length:{}", ctx.channel(), tag);
                 }
@@ -81,17 +86,17 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
             byte[] bytes = new byte[content.readableBytes()];
             content.readBytes(bytes);
             
-            RequestMethodModel methodModel = messageMethodInvoker.get(tag);
+            IMessageInvoker invoker = messageInvokerManager.get(tag);
             
-            if (methodModel == null || methodModel.getRequestMessageClass() == null) {
+            if (invoker == null) {
             	LOGGER.warn("Unsupported data: {}! tag:{} , channel:{}; ", new String(bytes), tag, ctx.channel());
             	return;
 			}
             
-            Object message = this.serializer.deserialize(bytes, methodModel.getRequestMessageClass());
+            Object message = this.serializer.deserialize(bytes, invoker.getRequestMessageClass());
             
             //反序列化 并且 提交任务
-            executor.submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), message, this.messageMethodInvoker));
+            executor.submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), message, this.messageInvokerManager,this.messageFilterManager));
             
             if(LOGGER.isDebugEnabled()){
             	LOGGER.debug("{} received binary message, tag:{} ; bytes-length:{}", ctx.channel(), tag, bytes.length);

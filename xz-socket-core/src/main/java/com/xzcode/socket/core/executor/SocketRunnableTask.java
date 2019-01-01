@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.xzcode.socket.core.filter.MessageFilterMapper;
+import com.xzcode.socket.core.filter.MessageFilterManager;
 import com.xzcode.socket.core.sender.SendModel;
 import com.xzcode.socket.core.sender.SocketMessageSender;
 import com.xzcode.socket.core.session.SocketSessionUtil;

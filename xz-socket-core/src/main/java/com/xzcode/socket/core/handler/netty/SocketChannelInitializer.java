@@ -1,23 +1,22 @@
 package com.xzcode.socket.core.handler.netty;
 
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.timeout.IdleStateHandler;
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.config.SocketServerConfig;
-import com.xzcode.socket.core.event.EventMethodInvoker;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.handler.netty.codec.DecodeHandler;
 import com.xzcode.socket.core.handler.netty.codec.EncodeHandler;
 import com.xzcode.socket.core.handler.netty.idle.IdleHandler;
 import com.xzcode.socket.core.handler.netty.life.InboundLifeCycleHandler;
 import com.xzcode.socket.core.handler.netty.life.OutboundLifeCycleHandler;
-import com.xzcode.socket.core.message.MessageMethodInvoker;
 import com.xzcode.socket.core.serializer.factory.SerializerFactory;
 
-import java.util.concurrent.TimeUnit;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
 /**
  * 默认channel初始化处理器
@@ -39,21 +38,14 @@ public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> 
 	public SocketChannelInitializer() {
 	}
 	
-	private MessageMethodInvoker messageMethodInvoker;
-	
-	private EventMethodInvoker eventMethodInvoker;
 
 	public SocketChannelInitializer(
 			SocketServerConfig config, 
-			SocketServerTaskExecutor taskExecutor,
-			MessageMethodInvoker messageMethodInvoker,
-			EventMethodInvoker eventMethodInvoker
+			SocketServerTaskExecutor taskExecutor
 			) {
 		super();
 		this.config = config;
 		this.taskExecutor = taskExecutor;
-		this.messageMethodInvoker = messageMethodInvoker;
-		this.eventMethodInvoker = eventMethodInvoker;
 	}
 	
 	
@@ -73,16 +65,16 @@ public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> 
 		   	 ch.pipeline().addLast(new IdleStateHandler(config.getReaderIdleTime(), config.getWriterIdleTime(), config.getAllIdleTime(), TimeUnit.MILLISECONDS));
 		   	 
 		   	 //心跳包处理
-		   	 ch.pipeline().addLast(new IdleHandler(this.taskExecutor, this.eventMethodInvoker));
+		   	 ch.pipeline().addLast(new IdleHandler(this.taskExecutor, config.getEventMethodInvoker()));
 		   	 
 	   	}
 	   	
    	 
 	   	 //消息解码器
-        ch.pipeline().addLast(new DecodeHandler(SerializerFactory.geSerializer(config.getSerializerType()), this.taskExecutor, messageMethodInvoker));
+        ch.pipeline().addLast(new DecodeHandler(SerializerFactory.geSerializer(config.getSerializerType()), this.taskExecutor, config.getMessageMethodInvokeMapper(),config.getMessageFilterManager()));
         
         //inbound异常处理
-        ch.pipeline().addLast(new InboundLifeCycleHandler(this.config, taskExecutor, eventMethodInvoker));
+        ch.pipeline().addLast(new InboundLifeCycleHandler(this.config, taskExecutor, config.getEventMethodInvoker()));
         
         
         //Outbound 是反顺序执行

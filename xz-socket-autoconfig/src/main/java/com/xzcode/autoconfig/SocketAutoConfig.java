@@ -21,6 +21,7 @@ import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.starter.SocketServerStarter;
 import com.xzcode.socket.core.starter.impl.DefaultSocketServerStarter;
 import com.xzcode.socket.core.starter.impl.WebSocketServerStarter;
+import com.xzcode.socket.core.utils.SocketServerService;
 
 @Configuration
 @ConditionalOnProperty(prefix = SocketAutoConfig.PROPERTIES_PREFIX, name = "enabled", havingValue = "true")
@@ -61,11 +62,20 @@ public class SocketAutoConfig implements ApplicationContextAware {
         
         return starter;
     }
+    
+    
 
     @Bean
     @ConfigurationProperties(prefix = SocketAutoConfig.PROPERTIES_PREFIX)
+    public SocketServerService socketServerService() {
+        return new SocketServerService(socketServerConfig().getUserSessonManager());
+    }
+    
+    
+    @Bean
+    @ConfigurationProperties(prefix = SocketAutoConfig.PROPERTIES_PREFIX)
     public SocketServerConfig socketServerConfig() {
-        return new SocketServerConfig();
+    	return new SocketServerConfig();
     }
 
     /**
@@ -90,9 +100,13 @@ public class SocketAutoConfig implements ApplicationContextAware {
 
             //动态注册bean.
             defaultListableBeanFactory.registerBeanDefinition(beanName, beanDefinitionBuilder.getBeanDefinition());
-            LOGGER.info("Socket server bean defind:{}", applicationContext.getBean(beanName));
-            map.put(key, applicationContext.getBean(beanName));
+            Object bean = applicationContext.getBean(beanName);
+            LOGGER.info("Socket server bean defind:{}", bean);
+            map.put(key, bean);
+            
         }
+        //更新组件对象
+        config.getMessageInvokerManager().updateMethodInvokerComponentObject(config.getComponentObjectMapper());
 
 
     }
