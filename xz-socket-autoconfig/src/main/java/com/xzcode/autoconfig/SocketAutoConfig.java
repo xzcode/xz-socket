@@ -68,7 +68,7 @@ public class SocketAutoConfig implements ApplicationContextAware {
     @Bean
     @ConfigurationProperties(prefix = SocketAutoConfig.PROPERTIES_PREFIX)
     public SocketServerService socketServerService() {
-        return new SocketServerService(socketServerConfig().getUserSessonManager());
+        return new SocketServerService(socketServerConfig());
     }
     
     

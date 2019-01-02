@@ -66,11 +66,11 @@ public class MessageInvokerManager {
 	 * @author zai
 	 * 2017-07-29
 	 */
-	public void put(String requestTag, MethodInvoker methodInvoker) {
+	public void put(String requestTag, IMessageInvoker messageInvoker) {
 		if (map.containsKey(requestTag)) {
 			throw new RuntimeException("requestTag '"+requestTag+"' is already mapped!");
 		}
-		map.put(requestTag, methodInvoker);
+		map.put(requestTag, messageInvoker);
 	}
 
 	/**

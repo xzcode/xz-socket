@@ -8,6 +8,7 @@ import com.xzcode.game.server.model.login.LoginResp;
 import com.xzcode.socket.core.annotation.SocketComponent;
 import com.xzcode.socket.core.annotation.SocketRequest;
 import com.xzcode.socket.core.annotation.SocketResponse;
+import com.xzcode.socket.core.message.SocketOnMessage;
 import com.xzcode.socket.core.utils.SocketServerService;
 
 /**
@@ -45,9 +46,9 @@ public class LoginController {
 		return loginResp;
 	}
 	
-	@SocketRequest("disconnect")
+	@SocketRequest("test")
 	public void disconnect() {
-		
+		/*
 		sss.send("disconnect.call", CommonResp.success().setMsg("关闭连接"), () -> {
 			//SocketServerUtil.disconnect();
 		});
@@ -55,8 +56,14 @@ public class LoginController {
 		while (i-- > 0) {
 			sss.send("disconnect.call", CommonResp.success().setMsg(i+""));
 		}
-		
-		sss.on("login.dis.req", (LoginResp o) ->{
+		*/
+		sss.on("login.dis.req", new SocketOnMessage<LoginReq>() {
+
+			@Override
+			public void onMessage(LoginReq req) {
+				System.out.println("on message: login.dis.req");
+				
+			}
 			
 		});
 		

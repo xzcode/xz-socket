@@ -7,8 +7,9 @@ import com.xzcode.socket.core.message.SocketOnMessage;
  * 
  * @author zai
  * 2019-01-01 22:11:15
+ * @param <T>
  */
-public class OnMessagerInvoker implements IMessageInvoker{
+public class OnMessagerInvoker<T> implements IMessageInvoker{
 	
 	
 	/**
@@ -25,12 +26,12 @@ public class OnMessagerInvoker implements IMessageInvoker{
 	/**
 	 * 消息调用对象
 	 */
-	private SocketOnMessage<Object> onMessage;
+	private SocketOnMessage<T> onMessage;
 
 
 	@Override
 	public Object invoke(String requestTag, Object message) throws Exception {
-		onMessage.onMessage(message);
+		onMessage.onMessage((T) message);
 		return null;
 	}
 
@@ -55,12 +56,12 @@ public class OnMessagerInvoker implements IMessageInvoker{
 	}
 
 
-	public SocketOnMessage<Object> getOnMessage() {
+	public SocketOnMessage<?> getOnMessage() {
 		return onMessage;
 	}
 
 
-	public void setOnMessage(SocketOnMessage<Object> onMessage) {
+	public void setOnMessage(SocketOnMessage<T> onMessage) {
 		this.onMessage = onMessage;
 	}
 
