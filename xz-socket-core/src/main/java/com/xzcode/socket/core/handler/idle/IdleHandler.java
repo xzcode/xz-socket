@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.idle;
+package com.xzcode.socket.core.handler.idle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

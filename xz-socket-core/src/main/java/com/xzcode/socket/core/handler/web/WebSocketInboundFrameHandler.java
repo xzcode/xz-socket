@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.web;
+package com.xzcode.socket.core.handler.web;
 
 import java.nio.charset.Charset;
 

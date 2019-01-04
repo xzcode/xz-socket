@@ -48,9 +48,9 @@ public interface SocketEvents {
 	     */
 		String ACTIVE = "ChannelState.ACTIVE";
 	    /**
-	     * channel 无效化
+	     * channel 关闭
 	     */
-		String INACTIVE = "ChannelState.INACTIVE";
+		String CLOSE = "ChannelState.CLOSE";
 
 	}
 

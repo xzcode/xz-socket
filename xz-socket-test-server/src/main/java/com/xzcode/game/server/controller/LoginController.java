@@ -69,7 +69,7 @@ public class LoginController {
 			
 		});
 		
-		sss.onEvent(SocketEvents.ChannelState.INACTIVE, () -> {
+		sss.onEvent(SocketEvents.ChannelState.CLOSE, () -> {
 			SocketSession session = sss.getSession();
 			System.out.println("----INACTIVE---");
 		});

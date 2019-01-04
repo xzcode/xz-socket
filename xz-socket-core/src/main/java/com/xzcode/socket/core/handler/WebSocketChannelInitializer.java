@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty;
+package com.xzcode.socket.core.handler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.config.SocketServerConfig;
-import com.xzcode.socket.core.handler.netty.idle.IdleHandler;
-import com.xzcode.socket.core.handler.netty.life.InboundLifeCycleHandler;
-import com.xzcode.socket.core.handler.netty.life.OutboundLifeCycleHandler;
-import com.xzcode.socket.core.handler.netty.web.WebSocketOutboundFrameHandler;
-import com.xzcode.socket.core.handler.netty.web.WebSocketServerHandler;
+import com.xzcode.socket.core.handler.idle.IdleHandler;
+import com.xzcode.socket.core.handler.life.InboundLifeCycleHandler;
+import com.xzcode.socket.core.handler.life.OutboundLifeCycleHandler;
+import com.xzcode.socket.core.handler.web.WebSocketOutboundFrameHandler;
+import com.xzcode.socket.core.handler.web.WebSocketServerHandler;
 import com.xzcode.socket.core.serializer.factory.SerializerFactory;
 
 import io.netty.channel.ChannelInitializer;

@@ -5,7 +5,7 @@ import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.config.scanner.SocketComponentScanner;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.executor.factory.EventLoopGroupThreadFactory;
-import com.xzcode.socket.core.handler.netty.SocketChannelInitializer;
+import com.xzcode.socket.core.handler.SocketChannelInitializer;
 import com.xzcode.socket.core.starter.SocketServerStarter;
 
 import io.netty.bootstrap.ServerBootstrap;

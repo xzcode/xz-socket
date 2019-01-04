@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.codec;
+package com.xzcode.socket.core.handler.codec;
 
 import com.xzcode.socket.core.sender.SendModel;
 import com.xzcode.socket.core.serializer.ISerializer;

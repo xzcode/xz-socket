@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.life;
+package com.xzcode.socket.core.handler.life;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;

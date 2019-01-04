@@ -1,21 +1,22 @@
-package com.xzcode.socket.core.handler.netty.life;
+package com.xzcode.socket.core.handler.life;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.net.InetSocketAddress;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.channel.DefaultAttributeKeys;
 import com.xzcode.socket.core.channel.SocketChannelGroups;
 import com.xzcode.socket.core.config.SocketServerConfig;
-import com.xzcode.socket.core.event.EventInvokerManager;
 import com.xzcode.socket.core.event.SocketEventTask;
 import com.xzcode.socket.core.event.SocketEvents;
-import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
-import com.xzcode.socket.core.session.UserSessonManager;
 import com.xzcode.socket.core.session.imp.SocketSession;
 
-import java.net.InetSocketAddress;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 	
@@ -67,32 +68,29 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 		
 		config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.ChannelState.ACTIVE, config.getEventInvokerManager()));
 		
+		
+		//注册channel关闭事件
+		ctx.channel().closeFuture().addListener((ChannelFuture future) -> {
+			Channel channel = future.channel();
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Channel Close:{}", ctx.channel());
+			}
+			SocketSession sezzion = channel.attr(DefaultAttributeKeys.SESSION).getAndSet(null);
+			
+			sezzion.inActive();
+			
+			config.getTaskExecutor().submit(new SocketEventTask(sezzion, SocketEvents.ChannelState.CLOSE, config.getEventInvokerManager()));
+			
+			//移除全局channelgroup绑定
+			SocketChannelGroups.getGlobalGroup().remove(ctx.channel());
+			
+			config.getUserSessonManager().remove(sezzion.getRegisteredUserId());
+			
+			SocketChannelGroups.getRegisteredGroup().remove(ctx.channel());
+		});
 		super.channelActive(ctx);
 	}
 	
-
-	@Override
-	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Channel Inactive:{}", ctx.channel());
-		}
-		SocketSession session = ctx.channel().attr(DefaultAttributeKeys.SESSION).getAndSet(null);
-		
-		session.inActive();
-		
-		config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.ChannelState.INACTIVE, config.getEventInvokerManager()));
-		
-		//移除全局channelgroup绑定
-		SocketChannelGroups.getGlobalGroup().remove(ctx.channel());
-		
-		config.getUserSessonManager().remove(session.getRegisteredUserId());
-		
-		SocketChannelGroups.getRegisteredGroup().remove(ctx.channel());
-		
-		super.channelInactive(ctx);
-	}
-
-
 	@Override
 	public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
 		if (LOGGER.isDebugEnabled()) {
@@ -100,9 +98,6 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 		}
 		super.channelUnregistered(ctx);
 	}
-	
-	
-	
 	
 	
 	@Override

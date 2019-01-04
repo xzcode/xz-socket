@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package com.xzcode.socket.core.handler.netty.web;
+package com.xzcode.socket.core.handler.web;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
@@ -129,16 +129,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
     }
 
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
-    	if (frame instanceof CloseWebSocketFrame) {
-            handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
-            ctx.close();
-            ctx.fireChannelInactive();
-            return;
-        }
-        if (frame instanceof PingWebSocketFrame) {
-            ctx.write(new PongWebSocketFrame(frame.content().retain()));
-            return;
-        }
+    	
     	if (frame instanceof BinaryWebSocketFrame) {
     		ByteBuf content = ((BinaryWebSocketFrame) frame).content();
             
@@ -182,12 +173,26 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
             }
     		return;
     	}
+    	if (frame instanceof CloseWebSocketFrame) {
+            //handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
+    		ctx.close();
+            return;
+        }
+        /*
         if (frame instanceof TextWebSocketFrame) {
         	if(LOGGER.isDebugEnabled()){
-        		LOGGER.debug("\nReceived string message:\nchannel{}\ntext:{} ; drop...", ctx.channel(), ((TextWebSocketFrame) frame).text());        		
+        		LOGGER.debug("\nReceived string message:\nchannel{}\ntext:{} ; Channel Close!!", ctx.channel(), ((TextWebSocketFrame) frame).text());        		
         	}
+        	ctx.close();
         	return;
         }
+        if (frame instanceof PingWebSocketFrame) {
+            ctx.write(new PongWebSocketFrame(frame.content().retain()));
+            return;
+        }
+        */
+        
+        ctx.close();
         
     }
 

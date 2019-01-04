@@ -1,4 +1,4 @@
-package com.xzcode.socket.core.handler.netty.codec;
+package com.xzcode.socket.core.handler.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
