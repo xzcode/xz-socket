@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.xzcode.socket.core.channel.DefaultAttributeKeys;
 import com.xzcode.socket.core.channel.SocketChannelGroups;
 import com.xzcode.socket.core.config.SocketServerConfig;
-import com.xzcode.socket.core.event.EventMethodInvoker;
+import com.xzcode.socket.core.event.EventInvokerManager;
 import com.xzcode.socket.core.event.SocketEventTask;
 import com.xzcode.socket.core.event.SocketEvents;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
@@ -21,11 +21,8 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(InboundLifeCycleHandler.class);
 	
-	private SocketServerTaskExecutor taskExecutor;
 	
 	private SocketServerConfig config;
-	
-	private EventMethodInvoker eventMethodInvoker;
 	
 	public InboundLifeCycleHandler() {
 	}
@@ -37,14 +34,6 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 		this.config = config;
 	}
 	
-	public InboundLifeCycleHandler(SocketServerConfig config, SocketServerTaskExecutor taskExecutor, EventMethodInvoker eventMethodInvoker) {
-		super();
-		this.config = config;
-		this.taskExecutor = taskExecutor;
-		this.eventMethodInvoker = eventMethodInvoker;
-	}
-
-
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
 		super.channelRead(ctx, msg);
@@ -76,7 +65,7 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 		//添加到全局channelgroup绑定
 		SocketChannelGroups.getGlobalGroup().add(ctx.channel());
 		
-		taskExecutor.submit(new SocketEventTask(session, SocketEvents.ChannelState.ACTIVE, eventMethodInvoker));
+		config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.ChannelState.ACTIVE, config.getEventInvokerManager()));
 		
 		super.channelActive(ctx);
 	}
@@ -91,7 +80,7 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 		
 		session.inActive();
 		
-		taskExecutor.submit(new SocketEventTask(session, SocketEvents.ChannelState.INACTIVE, eventMethodInvoker));
+		config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.ChannelState.INACTIVE, config.getEventInvokerManager()));
 		
 		//移除全局channelgroup绑定
 		SocketChannelGroups.getGlobalGroup().remove(ctx.channel());

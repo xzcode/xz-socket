@@ -18,6 +18,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
 
@@ -59,7 +60,12 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
 
 	@Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
-    	
+    	if (!ctx.channel().isActive()) {
+    		if(LOGGER.isDebugEnabled()){
+        		LOGGER.debug("\nRead channel:{} is inActive...", ctx.channel());        		
+        	}
+			return;
+		}
         if (frame instanceof BinaryWebSocketFrame) {
             ByteBuf content = ((BinaryWebSocketFrame) frame).content();
             
@@ -75,7 +81,7 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
             	
             	executor.submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), null ,this.messageInvokerManager,this.messageFilterManager));
             	if(LOGGER.isDebugEnabled()){
-                	LOGGER.debug("{} received binary message, tag:{} ; bytes-length:{}", ctx.channel(), tag);
+                	LOGGER.debug("\nReceived no-data-body binary message <----, \nchannel:{}\ntag:{}", ctx.channel(), tag);
                 }
             	return;
 			}
@@ -89,7 +95,7 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
             IMessageInvoker invoker = messageInvokerManager.get(tag);
             
             if (invoker == null) {
-            	LOGGER.warn("Unsupported data: {}! tag:{} , channel:{}; ", new String(bytes), tag, ctx.channel());
+            	LOGGER.warn("\nUnsupported data!!\nchannel:{}\ntag:{}\ndata:{}", ctx.channel(), tag, new String(bytes));
             	return;
 			}
             
@@ -99,20 +105,23 @@ public class WebSocketInboundFrameHandler extends SimpleChannelInboundHandler<We
             executor.submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), message, this.messageInvokerManager,this.messageFilterManager));
             
             if(LOGGER.isDebugEnabled()){
-            	LOGGER.debug("{} received binary message, tag:{} ; bytes-length:{}", ctx.channel(), tag, bytes.length);
+            	LOGGER.debug("\nReceived binary message  <----,\nchannel:{}\ntag:{}\nbytes-length:{}", ctx.channel(), tag, bytes.length);
             }
             
         }
-        else if (frame instanceof TextWebSocketFrame){
+        else if (frame instanceof CloseWebSocketFrame){
+        	//ctx.close();
+        }
+    	else if (frame instanceof TextWebSocketFrame){
         	TextWebSocketFrame text = (TextWebSocketFrame) frame;
         	//ctx.fireUserEventTriggered("hello--fireUserEventTriggered");
 			
         	if(LOGGER.isDebugEnabled()){
-        		LOGGER.debug("{} received string message:{} ; drop...", ctx.channel(), text.text());        		
+        		LOGGER.debug("\nReceived string message:\nchannel{}\ntext:{} ; drop...", ctx.channel(), text.text());        		
         	}
         	
         }else{
-        	throw new UnsupportedOperationException("Unsupported inbound data !");
+        	throw new UnsupportedOperationException("\nUnsupported inbound data !");
         }
     }
 	

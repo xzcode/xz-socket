@@ -1,88 +1,71 @@
 package com.xzcode.socket.core.event;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.xzcode.socket.core.component.SocketComponentObjectManager;
-
-public class EventMethodInvoker {
+public class EventMethodInvoker implements IEventInvoker {
 	
-	private SocketComponentObjectManager componentObjectMapper;
+	private String eventTag;
 	
-	
-	private final Map<String, EventMethodModel> map = new HashMap<>();
-	
-	
-	
-	
-	public EventMethodInvoker(SocketComponentObjectManager componentObjectMapper) {
-		super();
-		this.componentObjectMapper = componentObjectMapper;
-	}
-
 	/**
-	 * 调用被缓存的方法
-	 * @param requestTag
-	 * @param method
-	 * @param message
-	 * @throws Exception
-	 * 
-	 * @author zai
-	 * 2017-07-29
+	 * 组件实例对象
 	 */
-	public void invoke(String eventTag) throws Exception {
-		EventMethodModel eventMethodModel = map.get(eventTag);
-		if (eventMethodModel != null) {
-			Method method = null;
-			for (int i = 0; i < eventMethodModel.getMethods().size(); i++) {
-				method = eventMethodModel.getMethods().get(i);
-				method.invoke(componentObjectMapper.getSocketComponentObject(method.getDeclaringClass()));
-			}
+	private Object componentObj;
+	
+	/**
+	 * 组件实例对象的class类型
+	 */
+	private Class<?> componentClass;
+	
+	
+	private List<Method> methods = new ArrayList<>(1);
+	
+	
+	
+	@Override
+	public void invoke() throws Exception{
+		Method method = null;
+		for (int i = 0; i < methods.size(); i++) {
+			method = methods.get(i);
+			method.invoke(componentObj);
 		}
 	}
 	
-	/**
-	 * 添加缓存方法
-	 * @param model
-	 * 
-	 * @author zai
-	 * 2017-07-29
-	 */
-	public void put(EventMethodModel model) {
-		EventMethodModel methodModel = map.get(model.getEventTag());
-		if (methodModel != null) {
-			methodModel.getMethods().addAll(model.getMethods());
-			return;
-		}
-		map.put(model.getEventTag(), model);
+	public void setComponentClass(Class<?> componentClass) {
+		this.componentClass = componentClass;
 	}
 	
-	
-	/**
-	 * 获取关联方法模型
-	 * @param eventTag
-	 * @return
-	 * 
-	 * @author zai
-	 * 2017-08-02
-	 */
-	public EventMethodModel get(String eventTag){
-		return map.get(eventTag);
+	public Class<?> getComponentClass() {
+		return componentClass;
 	}
-	
-	/**
-	 * 是否存在指定事件类型
-	 * @param eventTag
-	 * @return
-	 * 
-	 * @author zai
-	 * 2018-05-29
-	 */
-	public boolean contains(String eventTag){
-		return map.containsKey(eventTag);
-	}
-	
 	
 
+	public String getEventTag() {
+		return eventTag;
+	}
+
+	public EventMethodInvoker setEventTag(String eventTag) {
+		this.eventTag = eventTag;
+		return this;
+	}
+
+	public List<Method> getMethods() {
+		return methods;
+	}
+	
+	public IEventInvoker addMethod(Method method) {
+		methods.add(method);
+		return this;
+	}
+
+	public void setComponentObj(Object componentObj) {
+		this.componentObj = componentObj;
+	}
+	
+	public Object getComponentObj() {
+		return componentObj;
+	}
+	
 }
+

@@ -65,16 +65,16 @@ public class SocketChannelInitializer extends ChannelInitializer<SocketChannel> 
 		   	 ch.pipeline().addLast(new IdleStateHandler(config.getReaderIdleTime(), config.getWriterIdleTime(), config.getAllIdleTime(), TimeUnit.MILLISECONDS));
 		   	 
 		   	 //心跳包处理
-		   	 ch.pipeline().addLast(new IdleHandler(this.taskExecutor, config.getEventMethodInvoker()));
+		   	 ch.pipeline().addLast(new IdleHandler(config));
 		   	 
 	   	}
 	   	
    	 
 	   	 //消息解码器
-        ch.pipeline().addLast(new DecodeHandler(SerializerFactory.geSerializer(config.getSerializerType()), this.taskExecutor, config.getMessageMethodInvokeMapper(),config.getMessageFilterManager()));
+        ch.pipeline().addLast(new DecodeHandler(SerializerFactory.geSerializer(config.getSerializerType()), this.taskExecutor, config.getMessageMethodInvokeManager(),config.getMessageFilterManager()));
         
         //inbound异常处理
-        ch.pipeline().addLast(new InboundLifeCycleHandler(this.config, taskExecutor, config.getEventMethodInvoker()));
+        ch.pipeline().addLast(new InboundLifeCycleHandler(this.config));
         
         
         //Outbound 是反顺序执行

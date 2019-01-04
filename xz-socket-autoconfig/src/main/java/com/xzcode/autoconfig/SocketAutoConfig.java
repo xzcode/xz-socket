@@ -18,6 +18,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.xzcode.socket.core.config.SocketServerConfig;
+import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
+import com.xzcode.socket.core.serializer.factory.SerializerFactory;
 import com.xzcode.socket.core.starter.SocketServerStarter;
 import com.xzcode.socket.core.starter.impl.DefaultSocketServerStarter;
 import com.xzcode.socket.core.starter.impl.WebSocketServerStarter;
@@ -40,6 +42,10 @@ public class SocketAutoConfig implements ApplicationContextAware {
     	SocketServerStarter starter = null;;
 
         SocketServerConfig config = socketServerConfig();
+        
+        config.setTaskExecutor(new SocketServerTaskExecutor(config));
+        
+        config.setSerializer(SerializerFactory.geSerializer(config.getSerializerType()));
 
         LOGGER.info(config.toString());
 
@@ -89,7 +95,7 @@ public class SocketAutoConfig implements ApplicationContextAware {
         //获取BeanFactory
         DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) this.applicationContext.getAutowireCapableBeanFactory();
 
-        Map<Class<?>, Object> map = config.getComponentObjectMapper().getComponentMap();
+        Map<Class<?>, Object> map = config.getComponentObjectManager().getComponentMap();
         for (Class<?> key : map.keySet()) {
 
             String beanName = StringUtils.uncapitalize(key.getSimpleName());
@@ -105,8 +111,11 @@ public class SocketAutoConfig implements ApplicationContextAware {
             map.put(key, bean);
             
         }
+        
         //更新组件对象
-        config.getMessageInvokerManager().updateMethodInvokerComponentObject(config.getComponentObjectMapper());
+        config.getMessageInvokerManager().updateComponentObject(config.getComponentObjectManager());
+        config.getEventInvokerManager().updateComponentObject(config.getComponentObjectManager());
+        config.getMessageFilterManager().updateComponentObject(config.getComponentObjectManager());
 
 
     }

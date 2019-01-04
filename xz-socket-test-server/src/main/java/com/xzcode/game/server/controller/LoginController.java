@@ -8,7 +8,9 @@ import com.xzcode.game.server.model.login.LoginResp;
 import com.xzcode.socket.core.annotation.SocketComponent;
 import com.xzcode.socket.core.annotation.SocketRequest;
 import com.xzcode.socket.core.annotation.SocketResponse;
+import com.xzcode.socket.core.event.SocketEvents;
 import com.xzcode.socket.core.message.SocketOnMessage;
+import com.xzcode.socket.core.session.imp.SocketSession;
 import com.xzcode.socket.core.utils.SocketServerService;
 
 /**
@@ -65,6 +67,11 @@ public class LoginController {
 				
 			}
 			
+		});
+		
+		sss.onEvent(SocketEvents.ChannelState.INACTIVE, () -> {
+			SocketSession session = sss.getSession();
+			System.out.println("----INACTIVE---");
 		});
 		
 	}

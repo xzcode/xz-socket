@@ -1,20 +1,20 @@
 package com.xzcode.socket.core.handler.netty.idle;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.channel.DefaultAttributeKeys;
-import com.xzcode.socket.core.event.EventMethodInvoker;
+import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.event.SocketEventTask;
 import com.xzcode.socket.core.event.SocketEvents;
-import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.session.imp.SocketSession;
 
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
+
 /**
- * 心跳包触发器
+ * 空闲触发器
  *
  * @author zai
  * 2017-08-04 23:23:06
@@ -23,9 +23,8 @@ public class IdleHandler extends ChannelInboundHandlerAdapter{
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(IdleHandler.class);
 
-	private SocketServerTaskExecutor taskExecutor;
+	private SocketServerConfig config;
 	
-	private EventMethodInvoker eventMethodInvoker;
 	
 	private boolean readerIdleEnabled;
 	
@@ -33,32 +32,26 @@ public class IdleHandler extends ChannelInboundHandlerAdapter{
 	
 	private boolean allIdleEnabled;
 	
-	public IdleHandler() {
+	public IdleHandler(SocketServerConfig config) {
+		this.config = config;
 		init();
 	}
 	
-	
-	public IdleHandler(SocketServerTaskExecutor taskExecutor, EventMethodInvoker eventMethodInvoker) {
-		super();
-		this.taskExecutor = taskExecutor;
-		this.eventMethodInvoker = eventMethodInvoker;
-		init();
-	}
 	
 	public void init() {
 		checkIdleEventMapped();
 	}
 	
 	public void checkIdleEventMapped() {
-		if(eventMethodInvoker.contains(SocketEvents.IdleState.WRITER_IDLE)) {
+		if(config.getEventInvokerManager().contains(SocketEvents.IdleState.WRITER_IDLE)) {
 			this.writerIdleEnabled = true;
 		}
 		
-		if (eventMethodInvoker.contains(SocketEvents.IdleState.READER_IDLE)) {
+		if (config.getEventInvokerManager().contains(SocketEvents.IdleState.READER_IDLE)) {
 			this.readerIdleEnabled = true;
 		}
 		
-		if (eventMethodInvoker.contains(SocketEvents.IdleState.ALL_IDLE)) {
+		if (config.getEventInvokerManager().contains(SocketEvents.IdleState.ALL_IDLE)) {
 			this.allIdleEnabled = true;
 		}
 		
@@ -78,7 +71,7 @@ public class IdleHandler extends ChannelInboundHandlerAdapter{
 							if (LOGGER.isDebugEnabled()) {
 								LOGGER.debug("...WRITER_IDLE...: channel:{}", ctx.channel());								
 							}
-							taskExecutor.submit(new SocketEventTask(session, SocketEvents.IdleState.WRITER_IDLE, eventMethodInvoker));
+							config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.IdleState.WRITER_IDLE, config.getEventInvokerManager()));
 						}
 					break;
 				case READER_IDLE:
@@ -86,7 +79,7 @@ public class IdleHandler extends ChannelInboundHandlerAdapter{
 							if (LOGGER.isDebugEnabled()) {
 								LOGGER.debug("...READER_IDLE...: channel:{}", ctx.channel());								
 							}
-							taskExecutor.submit(new SocketEventTask(session, SocketEvents.IdleState.READER_IDLE, eventMethodInvoker));
+							config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.IdleState.READER_IDLE, config.getEventInvokerManager()));
 						}
 					break;
 				case ALL_IDLE:
@@ -94,7 +87,7 @@ public class IdleHandler extends ChannelInboundHandlerAdapter{
 							if (LOGGER.isDebugEnabled()) {
 								LOGGER.debug("...ALL_IDLE...: channel:{}", ctx.channel());								
 							}
-							taskExecutor.submit(new SocketEventTask(session, SocketEvents.IdleState.ALL_IDLE, eventMethodInvoker));
+							config.getTaskExecutor().submit(new SocketEventTask(session, SocketEvents.IdleState.ALL_IDLE, config.getEventInvokerManager()));
 						}
 					break;
 				default:
@@ -107,13 +100,4 @@ public class IdleHandler extends ChannelInboundHandlerAdapter{
         } 
 		
 	}
-
-	public SocketServerTaskExecutor getTaskExecutor() {
-		return taskExecutor;
-	}
-	
-	public void setTaskExecutor(SocketServerTaskExecutor taskExecutor) {
-		this.taskExecutor = taskExecutor;
-	}
-	
 }

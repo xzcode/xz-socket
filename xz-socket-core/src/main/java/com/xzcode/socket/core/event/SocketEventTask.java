@@ -10,10 +10,10 @@ public class SocketEventTask implements Runnable{
 	
 private final static Logger LOGGER = LoggerFactory.getLogger(SocketEventTask.class);
 	
-	private EventMethodInvoker eventMethodInvoker;
+	private EventInvokerManager eventInvokerManager;
 	
-	public void setMethodInvokeMapper(EventMethodInvoker eventMethodInvoker) {
-		this.eventMethodInvoker = eventMethodInvoker;
+	public void setMethodInvokeMapper(EventInvokerManager eventInvokerManager) {
+		this.eventInvokerManager = eventInvokerManager;
 	}
 
 	/**
@@ -28,11 +28,11 @@ private final static Logger LOGGER = LoggerFactory.getLogger(SocketEventTask.cla
 	
 	
 
-	public SocketEventTask(SocketSession session, String socketEvent, EventMethodInvoker eventMethodInvoker) {
+	public SocketEventTask(SocketSession session, String socketEvent, EventInvokerManager eventInvokerManager) {
 		super();
 		this.session = session;
 		this.socketEvent = socketEvent;
-		this.eventMethodInvoker = eventMethodInvoker;
+		this.eventInvokerManager = eventInvokerManager;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ private final static Logger LOGGER = LoggerFactory.getLogger(SocketEventTask.cla
 			
 			LOGGER.debug("Runing  SocketEventTask... tag:{}", socketEvent);
 			
-			eventMethodInvoker.invoke(socketEvent);
+			eventInvokerManager.invoke(socketEvent);
 			
 		} catch (Exception e) {
 			LOGGER.error("Socket Event Task Error!!", e);

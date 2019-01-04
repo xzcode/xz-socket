@@ -30,7 +30,7 @@ public class MessageInvokerManager {
 	 * @author zai
 	 * 2019-01-01 23:34:22
 	 */
-	public void updateMethodInvokerComponentObject(SocketComponentObjectManager componentObjectMapper) {
+	public void updateComponentObject(SocketComponentObjectManager componentObjectMapper) {
 		for (String key : map.keySet()) {
 			IMessageInvoker invoker = map.get(key);
 			if (invoker instanceof MethodInvoker) {

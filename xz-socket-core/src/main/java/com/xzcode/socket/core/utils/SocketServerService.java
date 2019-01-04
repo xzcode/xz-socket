@@ -6,6 +6,8 @@ import java.lang.reflect.TypeVariable;
 
 import com.xzcode.socket.core.channel.SocketChannelGroups;
 import com.xzcode.socket.core.config.SocketServerConfig;
+import com.xzcode.socket.core.event.EventRunnableInvoker;
+import com.xzcode.socket.core.event.IEventInvoker;
 import com.xzcode.socket.core.message.MessageInvokerManager;
 import com.xzcode.socket.core.message.SocketOnMessage;
 import com.xzcode.socket.core.message.invoker.OnMessagerInvoker;
@@ -25,9 +27,6 @@ public class SocketServerService {
 	private SocketServerConfig serverConfig;
 	
 	
-	
-	
-
 
 
 	public SocketServerService(SocketServerConfig serverConfig) {
@@ -315,6 +314,26 @@ public class SocketServerService {
         System.out.println("泛型参数的实现："+((ParameterizedType)socketOnMessage.getClass().getGenericInterfaces()[0]).getActualTypeArguments()[0].getClass());
         */
 		serverConfig.getMessageInvokerManager().put(requestTag, invoker);
+	}
+	
+	/**
+	 * 动态添加事件监听
+	 * 
+	 * @param eventTag
+	 * @param runnable
+	 * @author zai
+	 * 2019-01-02 20:02:37
+	 */
+	public <T> void onEvent(String eventTag, Runnable runnable) {
+		IEventInvoker eventInvoker = serverConfig.getEventInvokerManager().get(eventTag);
+		if (eventInvoker != null) {
+			((EventRunnableInvoker)eventInvoker).addRunnable(runnable);
+			return;
+		}
+		EventRunnableInvoker invoker = new EventRunnableInvoker();
+		invoker.setEventTag(eventTag);
+		invoker.addRunnable(runnable);
+		serverConfig.getEventInvokerManager().put(invoker);
 	}
 
 }

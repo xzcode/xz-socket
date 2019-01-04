@@ -11,8 +11,8 @@ import com.xzcode.socket.core.annotation.SocketOnEvent;
 import com.xzcode.socket.core.annotation.SocketRequest;
 import com.xzcode.socket.core.annotation.SocketResponse;
 import com.xzcode.socket.core.component.SocketComponentObjectManager;
+import com.xzcode.socket.core.event.EventInvokerManager;
 import com.xzcode.socket.core.event.EventMethodInvoker;
-import com.xzcode.socket.core.event.EventMethodModel;
 import com.xzcode.socket.core.filter.MessageFilterManager;
 import com.xzcode.socket.core.filter.MessageFilterModel;
 import com.xzcode.socket.core.filter.SocketMessageFilter;
@@ -37,7 +37,7 @@ public class SocketComponentScanner {
 	public static void scan(
 			SocketComponentObjectManager componentObjectMapper,
 			MessageInvokerManager messageInvokerManager, 
-			EventMethodInvoker eventMethodInvoker, 
+			EventInvokerManager eventInvokerManager, 
 			MessageFilterManager filterMapper, 
 			String... packageName
 			) {
@@ -73,7 +73,7 @@ public class SocketComponentScanner {
 					}
 					int value = filter.value();
 					int order = filter.order();
-					filterMapper.add(new MessageFilterModel(order != 0 ? order : value, (SocketMessageFilter) clazzInstance));
+					filterMapper.add(new MessageFilterModel(order != 0 ? order : value, clazz));
 
 				}
 
@@ -111,10 +111,11 @@ public class SocketComponentScanner {
 									+ " unsupport methods with parameters! ");
 						}
 
-						EventMethodModel eventMethodModel = new EventMethodModel();
-						eventMethodModel.setEventTag(socketOnEvent.value()).addMethod(mtd);
+						EventMethodInvoker eventMethodInvoker = new EventMethodInvoker();
+						eventMethodInvoker.setEventTag(socketOnEvent.value()).addMethod(mtd);
+						eventMethodInvoker.setComponentClass(clazz);
 
-						eventMethodInvoker.put(eventMethodModel);
+						eventInvokerManager.put(eventMethodInvoker);
 					}
 
 				}

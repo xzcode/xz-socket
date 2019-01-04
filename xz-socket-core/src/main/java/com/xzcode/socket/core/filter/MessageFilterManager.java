@@ -3,6 +3,10 @@ package com.xzcode.socket.core.filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.xzcode.socket.core.component.SocketComponentObjectManager;
+import com.xzcode.socket.core.message.invoker.IMessageInvoker;
+import com.xzcode.socket.core.message.invoker.MethodInvoker;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +23,13 @@ public class MessageFilterManager {
 	
 	private final List<MessageFilterModel> filters = new ArrayList<>(1);
 	
+	
+	
+	public void updateComponentObject(SocketComponentObjectManager componentObjectMapper) {
+		for (MessageFilterModel filterModel : filters) {
+			filterModel.setFilter((SocketMessageFilter) componentObjectMapper.getSocketComponentObject(filterModel.getFilterClazz()));
+		}
+	}
 	
 	
 	public void add(MessageFilterModel filterModel) {
@@ -54,7 +65,7 @@ public class MessageFilterManager {
 		SocketMessageFilter filter = null;
 		for(int i = 0; i < filters.size(); i ++) {
 			filter = filters.get(i).getFilter();
-			if (!filters.get(i).getFilter().doFilter(requestTag, message)) {
+			if (!filter.doFilter(requestTag, message)) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug("Message filtered by {}, requestTag:{} .", filter.getClass().getName(),requestTag);					
 				}

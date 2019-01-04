@@ -3,9 +3,11 @@ package com.xzcode.socket.core.config;
 import java.util.Arrays;
 
 import com.xzcode.socket.core.component.SocketComponentObjectManager;
-import com.xzcode.socket.core.event.EventMethodInvoker;
+import com.xzcode.socket.core.event.EventInvokerManager;
+import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.filter.MessageFilterManager;
 import com.xzcode.socket.core.message.MessageInvokerManager;
+import com.xzcode.socket.core.serializer.ISerializer;
 import com.xzcode.socket.core.serializer.factory.SerializerFactory;
 import com.xzcode.socket.core.session.UserSessonManager;
 
@@ -39,6 +41,8 @@ public class SocketServerConfig {
 	private long 		readerIdleTime = 5000;
 	private long 		writerIdleTime = 5000;
 	private long 		allIdleTime = 5000;
+	
+	private int 		maxDataLength = 1024 * 1024 * 5;
 
 	private String 		serverType = ServerTypeConstants.SOCKET;
 
@@ -50,11 +54,15 @@ public class SocketServerConfig {
 	
 	private boolean		useSSL = false;
 	
+	private ISerializer serializer;
+	
 	private SocketComponentObjectManager componentObjectManager = new SocketComponentObjectManager();
 	private MessageInvokerManager messageInvokerManager = new MessageInvokerManager();
 	private MessageFilterManager messageFilterManager = new MessageFilterManager();
-	private EventMethodInvoker eventMethodInvoker = new EventMethodInvoker(componentObjectManager);
+	private EventInvokerManager eventInvokerManager = new EventInvokerManager();
 	private UserSessonManager userSessonManager = new UserSessonManager();
+	
+	private SocketServerTaskExecutor taskExecutor;
 	
 	
 	public static interface ServerTypeConstants{
@@ -65,8 +73,20 @@ public class SocketServerConfig {
 		
 	}
 	
+	public void setSerializer(ISerializer serializer) {
+		this.serializer = serializer;
+	}
 	
+	public ISerializer getSerializer() {
+		return serializer;
+	}
 	
+	public void setTaskExecutor(SocketServerTaskExecutor taskExecutor) {
+		this.taskExecutor = taskExecutor;
+	}
+	public SocketServerTaskExecutor getTaskExecutor() {
+		return taskExecutor;
+	}
 	
 	public boolean isEnabled() {
 		return enabled;
@@ -255,22 +275,22 @@ public class SocketServerConfig {
 		builder.append(", messageInvokerManager=");
 		builder.append(messageInvokerManager);
 		builder.append(", eventMethodInvoker=");
-		builder.append(eventMethodInvoker);
+		builder.append(eventInvokerManager);
 		builder.append(", userSessonManager=");
 		builder.append(userSessonManager);
 		builder.append("]");
 		return builder.toString();
 	}
-	public SocketComponentObjectManager getComponentObjectMapper() {
+	public SocketComponentObjectManager getComponentObjectManager() {
 		return componentObjectManager;
 	}
 	public void setComponentObjectMapper(SocketComponentObjectManager componentObjectMapper) {
 		this.componentObjectManager = componentObjectMapper;
 	}
-	public MessageInvokerManager getMessageMethodInvokeMapper() {
+	public MessageInvokerManager getMessageMethodInvokeManager() {
 		return messageInvokerManager;
 	}
-	public void setMessageMethodInvokeMapper(MessageInvokerManager messageInvokerManager) {
+	public void setMessageMethodInvokeManager(MessageInvokerManager messageInvokerManager) {
 		this.messageInvokerManager = messageInvokerManager;
 	}
 	public boolean isUseSSL() {
@@ -285,11 +305,11 @@ public class SocketServerConfig {
 	public void setMessageInvokerManager(MessageInvokerManager messageInvokerManager) {
 		this.messageInvokerManager = messageInvokerManager;
 	}
-	public EventMethodInvoker getEventMethodInvoker() {
-		return eventMethodInvoker;
+	public EventInvokerManager getEventInvokerManager() {
+		return eventInvokerManager;
 	}
-	public void setEventMethodInvoker(EventMethodInvoker eventMethodInvoker) {
-		this.eventMethodInvoker = eventMethodInvoker;
+	public void setEventInvokerManager(EventInvokerManager eventInvokerManager) {
+		this.eventInvokerManager = eventInvokerManager;
 	}
 	public UserSessonManager getUserSessonManager() {
 		return userSessonManager;
@@ -307,7 +327,13 @@ public class SocketServerConfig {
 	}
 	
 	
+	public int getMaxDataLength() {
+		return maxDataLength;
+	}
 	
+	public void setMaxDataLength(int maxDataLength) {
+		this.maxDataLength = maxDataLength;
+	}
 	
 
 }

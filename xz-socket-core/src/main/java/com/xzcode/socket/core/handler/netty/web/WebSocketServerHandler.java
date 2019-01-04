@@ -15,6 +15,23 @@
  */
 package com.xzcode.socket.core.handler.netty.web;
 
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
+
+import java.nio.charset.Charset;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.xzcode.socket.core.channel.DefaultAttributeKeys;
+import com.xzcode.socket.core.config.SocketServerConfig;
+import com.xzcode.socket.core.message.SocketRequestTask;
+import com.xzcode.socket.core.message.invoker.IMessageInvoker;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -36,21 +53,29 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.util.CharsetUtil;
 
-import static io.netty.handler.codec.http.HttpMethod.*;
-import static io.netty.handler.codec.http.HttpResponseStatus.*;
-import static io.netty.handler.codec.http.HttpVersion.*;
-
 /**
  * Handles handshakes and messages
  */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketServerHandler.class);
 
-    private static final String WEBSOCKET_PATH = "/websocket";
+    //private static final String WEBSOCKET_PATH = "/websocket";
 
     private WebSocketServerHandshaker handshaker;
+    
+    
+    private SocketServerConfig config;
+    
+    
 
-    @Override
-    public void channelRead0(ChannelHandlerContext ctx, Object msg) {
+    public WebSocketServerHandler(SocketServerConfig config) {
+		super();
+		this.config = config;
+	}
+
+	@Override
+    public void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof FullHttpRequest) {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {
@@ -63,7 +88,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         ctx.flush();
     }
 
-    private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) {
+    private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) throws Exception {
         // Handle a bad request.
         if (!req.decoderResult().isSuccess()) {
             sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
@@ -94,8 +119,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         }
 
         // Handshake
-        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(
-                getWebSocketLocation(req), null, true, 5 * 1024 * 1024);
+        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, true, config.getMaxDataLength());
         handshaker = wsFactory.newHandshaker(req);
         if (handshaker == null) {
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
@@ -104,26 +128,67 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         }
     }
 
-    private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) {
-
-        // Check for closing frame
-        if (frame instanceof CloseWebSocketFrame) {
+    private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
+    	if (frame instanceof CloseWebSocketFrame) {
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
+            ctx.close();
+            ctx.fireChannelInactive();
             return;
         }
         if (frame instanceof PingWebSocketFrame) {
             ctx.write(new PongWebSocketFrame(frame.content().retain()));
             return;
         }
+    	if (frame instanceof BinaryWebSocketFrame) {
+    		ByteBuf content = ((BinaryWebSocketFrame) frame).content();
+            
+            Integer readUShort = content.readUnsignedShort();
+            
+            byte[] tagBytes = new byte[readUShort];
+            content.readBytes(tagBytes);
+            
+            String tag = new String(tagBytes, Charset.forName("utf-8"));
+            
+            //如果没有数据体
+            if (content.readableBytes() == 0) {            	
+            	
+            	config.getTaskExecutor().submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), null ,config.getMessageInvokerManager(),config.getMessageFilterManager()));
+            	if(LOGGER.isDebugEnabled()){
+                	LOGGER.debug("\nReceived no-data-body binary message <----, \nchannel:{}\ntag:{}", ctx.channel(), tag);
+                }
+            	return;
+			}
+            
+            
+          //如果有数据体
+            
+            byte[] bytes = new byte[content.readableBytes()];
+            content.readBytes(bytes);
+            
+            IMessageInvoker invoker = config.getMessageInvokerManager().get(tag);
+            
+            if (invoker == null) {
+            	LOGGER.warn("\nUnsupported data!!\nchannel:{}\ntag:{}\ndata:{}", ctx.channel(), tag, new String(bytes));
+            	return;
+			}
+            
+            Object message = config.getSerializer().deserialize(bytes, invoker.getRequestMessageClass());
+            
+            //反序列化 并且 提交任务
+            config.getTaskExecutor().submit(new SocketRequestTask(tag, ctx.channel().attr(DefaultAttributeKeys.SESSION).get(), message, config.getMessageInvokerManager(),config.getMessageFilterManager()));
+            
+            if(LOGGER.isDebugEnabled()){
+            	LOGGER.debug("\nReceived binary message  <----,\nchannel:{}\ntag:{}\nbytes-length:{}", ctx.channel(), tag, bytes.length);
+            }
+    		return;
+    	}
         if (frame instanceof TextWebSocketFrame) {
-            // Echo the frame
-            ctx.write(frame.retain());
-            return;
+        	if(LOGGER.isDebugEnabled()){
+        		LOGGER.debug("\nReceived string message:\nchannel{}\ntext:{} ; drop...", ctx.channel(), ((TextWebSocketFrame) frame).text());        		
+        	}
+        	return;
         }
-        if (frame instanceof BinaryWebSocketFrame) {
-            // Echo the frame
-            ctx.write(frame.retain());
-        }
+        
     }
 
     private static void sendHttpResponse(
@@ -149,8 +214,8 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
         ctx.close();
     }
 
-    private static String getWebSocketLocation(FullHttpRequest req) {
-        String location =  req.headers().get(HttpHeaderNames.HOST) + WEBSOCKET_PATH;
+    private String getWebSocketLocation(FullHttpRequest req) {
+        String location =  req.headers().get(HttpHeaderNames.HOST) + this.config.getWebsocketPath();
         return "wss://" + location;
     }
 }

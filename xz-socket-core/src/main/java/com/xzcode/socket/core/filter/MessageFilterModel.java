@@ -12,12 +12,17 @@ public class MessageFilterModel {
 	 */
 	private int order;
 	
+	private Class<?> filterClazz;
+	
 	private SocketMessageFilter filter;
+	
+	
 
-	public MessageFilterModel(int order, SocketMessageFilter filter) {
+
+	public MessageFilterModel(int order, Class<?> filterClazz) {
 		super();
 		this.order = order;
-		this.filter = filter;
+		this.filterClazz = filterClazz;
 	}
 
 	public int getOrder() {
@@ -36,7 +41,13 @@ public class MessageFilterModel {
 		this.filter = filter;
 	}
 	
+	public Class<?> getFilterClazz() {
+		return filterClazz;
+	}
 	
+	public void setFilterClazz(Class<?> filterClazz) {
+		this.filterClazz = filterClazz;
+	}
 	
 
 }

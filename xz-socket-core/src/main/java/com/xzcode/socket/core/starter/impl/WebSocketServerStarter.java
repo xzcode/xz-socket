@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.config.scanner.SocketComponentScanner;
-import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.executor.factory.EventLoopGroupThreadFactory;
 import com.xzcode.socket.core.handler.netty.WebSocketChannelInitializer;
 import com.xzcode.socket.core.starter.SocketServerStarter;
@@ -28,7 +27,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 
 /**
  * websocket 服务启动器
@@ -46,10 +44,8 @@ public class WebSocketServerStarter implements SocketServerStarter {
 	
 	private EventLoopGroup workerGroup;
 	
-	private SocketServerTaskExecutor taskExecutor;
-    
     private SslContext sslCtx;
-    
+
     public static SSLEngine sslEngine;
     
     public SSLContext createSSLContext(String type ,String path ,String password) throws Exception {  
@@ -74,12 +70,10 @@ public class WebSocketServerStarter implements SocketServerStarter {
     	config.setServerType(SocketServerConfig.ServerTypeConstants.WEBSOCKET);
     	this.config = config;
     	
-        this.taskExecutor = new SocketServerTaskExecutor(config);
-        
         SocketComponentScanner.scan(
-        		config.getComponentObjectMapper(),
-        		config.getMessageMethodInvokeMapper(),
-        		config.getEventMethodInvoker(),
+        		config.getComponentObjectManager(),
+        		config.getMessageMethodInvokeManager(),
+        		config.getEventInvokerManager(),
         		config.getMessageFilterManager(),
         		config.getScanPackage()
         		);
@@ -106,7 +100,6 @@ public class WebSocketServerStarter implements SocketServerStarter {
             //设置消息处理器
             boot.childHandler(new WebSocketChannelInitializer(
             		config, 
-            		taskExecutor,
             		sslCtx
             		));
             

@@ -35,9 +35,9 @@ public class DefaultSocketServerStarter implements SocketServerStarter {
         this.taskExecutor = new SocketServerTaskExecutor(config);
         
         SocketComponentScanner.scan(
-        		config.getComponentObjectMapper(),
-        		config.getMessageMethodInvokeMapper(),
-        		config.getEventMethodInvoker(),
+        		config.getComponentObjectManager(),
+        		config.getMessageMethodInvokeManager(),
+        		config.getEventInvokerManager(),
         		config.getMessageFilterManager(),
         		config.getScanPackage()
         		);

@@ -49,7 +49,7 @@ public class PingPongEventHandler {
 		pingPongInfo.heartBeatLostTimesIncrease();
 		
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Sending Ping-----> HeartBeatInfo:{}", pingPongInfo);
+			LOGGER.debug("\n-----ALL_IDLE------   : {}", pingPongInfo);
 		}
 		
 	}

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xzcode.socket.core.channel.DefaultAttributeKeys;
+import com.xzcode.socket.core.config.SocketServerConfig;
 import com.xzcode.socket.core.executor.SocketRunnableTask;
 import com.xzcode.socket.core.executor.SocketServerTaskExecutor;
 import com.xzcode.socket.core.sender.SendModel;
@@ -14,6 +15,8 @@ import com.xzcode.socket.core.session.SocketSessionUtil;
 import com.xzcode.socket.core.session.imp.SocketSession;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -30,8 +33,7 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketOutboundFrameHandler.class);
     
-    private ISerializer serializer;
-    private SocketServerTaskExecutor taskExecutor;
+    private SocketServerConfig config;
     
     private static final Gson GSON = new GsonBuilder()
     		.serializeNulls()
@@ -44,9 +46,9 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
     
     
 
-	public WebSocketOutboundFrameHandler(ISerializer serializer) {
+	public WebSocketOutboundFrameHandler(SocketServerConfig config) {
 		super();
-		this.serializer = serializer;
+		this.config = config;
 	}
 
 
@@ -54,46 +56,74 @@ public class WebSocketOutboundFrameHandler extends ChannelOutboundHandlerAdapter
 
 	@Override
 	public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
+		Channel channel = ctx.channel();
+		if (!channel.isActive()) {
+    		if(LOGGER.isDebugEnabled()){
+        		LOGGER.debug("\nWrite channel:{} is inActive...", ctx.channel());        		
+        	}
+			return;
+		}
 		if (msg instanceof SendModel) {
 			SendModel sendModel = (SendModel) msg;
-			//添加完成监听
-			promise.addListener((future) -> {
-				if (future.isDone() && sendModel.getCallback() != null) {
-					new SocketRunnableTask( sendModel.getCallback(), ctx.channel().attr(DefaultAttributeKeys.SESSION).get());
-				}
-			});
+			
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Sending tag:{} ; message:{}", sendModel.getSendTag(), GSON.toJson(sendModel.getMessage()));
+				LOGGER.debug("\nSending message ---> \ntag:{}\nmessage:{}", sendModel.getSendTag(), GSON.toJson(sendModel));
 			}
 			
 			
 			byte[] tagBytes = sendModel.getSendTag().getBytes();
 			
+			ByteBuf out = null;
+			
 			//如果有消息体
 			if (sendModel.getMessage() != null) {
 				
-				byte[] bodyBytes = this.serializer.serialize(sendModel.getMessage());
+				byte[] bodyBytes = config.getSerializer().serialize(sendModel.getMessage());
 				
-				ByteBuf out = ctx.alloc().buffer(2 + tagBytes.length + bodyBytes.length);
+				out = ctx.alloc().buffer(2 + tagBytes.length + bodyBytes.length);
 				
 				out.writeShort(tagBytes.length);
 				out.writeBytes(tagBytes);
 				out.writeBytes(bodyBytes);
-				
-				ctx.write(new BinaryWebSocketFrame(out));
-				
 			} else {
 			
 				//如果没消息体
 				
-				ByteBuf out = ctx.alloc().buffer(2 + tagBytes.length);
+				out = ctx.alloc().buffer(2 + tagBytes.length);
 				
 				out.writeShort(tagBytes.length);
 				out.writeBytes(tagBytes);
 				
-				ctx.writeAndFlush(new BinaryWebSocketFrame(out));
 			}
 			
+			ChannelFuture channelFuture = null;
+			if(channel.isWritable()){
+				channelFuture =  ctx.writeAndFlush(new BinaryWebSocketFrame(out));
+			}else {
+				try {
+					if (LOGGER.isInfoEnabled()) {
+                    	LOGGER.info("Channel is not writable, change to sync mode! \nchannel:{}", channel);
+                    }
+					channelFuture = channel.writeAndFlush(out).sync();
+                    if (LOGGER.isInfoEnabled()) {
+                    	LOGGER.info("Sync message sended. \nchannel:{}\nmessage:{}", channel, GSON.toJson(msg));
+                    }
+                } catch (InterruptedException e) {
+                	if (LOGGER.isInfoEnabled()) {
+                		LOGGER.info("write and flush msg exception. msg:[{}]", GSON.toJson(msg), e);
+                	}
+                }
+			}
+			//添加回调
+			if (channelFuture != null) {
+				channelFuture.addListener(future -> {
+					if (future.isSuccess()) {
+						if (sendModel.getCallback() != null) {
+							config.getTaskExecutor().submit(new SocketRunnableTask(sendModel.getCallback(), channel.attr(DefaultAttributeKeys.SESSION).get()));
+	    				}
+					}
+				});
+			}
 			
 			
 		}else if(msg instanceof DefaultFullHttpResponse){
