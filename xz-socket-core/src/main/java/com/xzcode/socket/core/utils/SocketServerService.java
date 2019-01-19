@@ -214,6 +214,18 @@ public class SocketServerService {
 	public SocketSession getSession() {
 		return SocketSessionUtil.getSession();
 	}
+	
+	/**
+	 * 获取指定用户的session
+	 * 
+	 * @param userId
+	 * @return
+	 * @author zai
+	 * 2019-01-19 15:50:11
+	 */
+	public SocketSession getSession(Object userId) {
+		return this.serverConfig.getUserSessonManager().get(userId);
+	}
 
 	/**
 	 * 把用户绑定到当前通信会话
