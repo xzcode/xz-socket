@@ -84,7 +84,13 @@ public class InboundLifeCycleHandler extends ChannelInboundHandlerAdapter{
 			//移除全局channelgroup绑定
 			SocketChannelGroups.getGlobalGroup().remove(ctx.channel());
 			
-			config.getUserSessonManager().remove(sezzion.getRegisteredUserId());
+			SocketSession userSession = config.getUserSessonManager().get(sezzion.getRegisteredUserId());
+			
+			//如果session相同，是断线，可移除session，否则存在被重复登录的情况，不应该移除session关联
+			if (sezzion == userSession) {
+				config.getUserSessonManager().remove(sezzion.getRegisteredUserId());				
+			}
+			
 			
 			SocketChannelGroups.getRegisteredGroup().remove(ctx.channel());
 		});
