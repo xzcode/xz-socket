@@ -32,11 +32,12 @@ public class SocketServerTaskExecutor extends ThreadPoolExecutor{
 				return new Thread(r,"Socket Server Task Thread - " + threadIndex.getAndIncrement());
 			}
 		}, 
+		//任务拒绝策略
 		new RejectedExecutionHandler() {
-			
 			@Override
 			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-				logger.error("Socket Server Task Rejected ! Task:{} ", r);
+				logger.warn("A Task Is Running At A [Rejected Execution Thread] ! Task:{} ", r);
+				new Thread(r, "Socket Server Task [Rejected Execution Thread] - " + threadIndex.getAndIncrement());
 			}
 			
 		});

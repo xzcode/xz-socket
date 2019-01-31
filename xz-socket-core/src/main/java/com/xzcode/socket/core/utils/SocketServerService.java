@@ -284,6 +284,7 @@ public class SocketServerService {
 	 */
 	public void disconnect(Object userId) {
 		SocketSession session = this.serverConfig.getUserSessonManager().get(userId);
+		userRegister(userId);
 		if (session != null && session.getChannel() != null) {
 			session.getChannel().close();
 		}
